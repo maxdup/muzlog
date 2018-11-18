@@ -16,7 +16,7 @@ class User(db.Document, UserMixin):
     email = db.EmailField(max_length=255, nullable=False,
                           unique=True, sparse=True)
     password = db.StringField(max_length=255, nullable=False)
-    username = db.StringField(max_length=75, nullable=False, required=True)
+    username = db.StringField(max_length=75, nullable=False)
     bio = db.StringField(max_length=400, nullable=True)
 
     avatar = db.StringField(default="")

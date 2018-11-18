@@ -1,0 +1,17 @@
+{%- with messages = get_flashed_messages(with_categories=true) -%}
+{% if messages %}
+<div class="flashes">
+  <ul>
+    {% for category, message in messages %}
+    <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  <a id="dismiss" class="dismiss">✖</a>
+</div>
+{% endif %}
+{%- endwith %}
+<script>
+  $('#dismiss').click(function() {
+  $('.flashes').fadeOut();
+  });
+</script>
