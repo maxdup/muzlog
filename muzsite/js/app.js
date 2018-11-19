@@ -1,9 +1,12 @@
 require('jquery/dist/jquery.js')
 require('angular/angular.js');
+require('angular-animate/angular-animate.js');
 require('angular-resource/angular-resource.js');
 require('@uirouter/angularjs');
 
-module.exports = angular.module('szApp', ['ui.router', 'ngAnimate'])
+
+module.exports = angular.module('muzApp', [
+  'ui.router', 'ngAnimate', 'muz.adminCtrl'])
   .config([
     "$locationProvider", "$stateProvider", "$urlRouterProvider",
     function($locationProvider, $stateProvider, $urlRouterProvider,){
@@ -11,8 +14,7 @@ module.exports = angular.module('szApp', ['ui.router', 'ngAnimate'])
       $stateProvider
         .state('home', {
           url: '/',
-          tempalteUrl: 'home.html',
+          templateUrl: 'home.html',
         })
       $locationProvider.html5Mode(true);
     }]);
-

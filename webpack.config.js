@@ -3,6 +3,7 @@ var webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 var rootAssetPath = './muzsite'
+
 module.exports = {
   mode: 'development',
   watch: true,
@@ -14,6 +15,8 @@ module.exports = {
     flask_security: [ rootAssetPath + "/scss/security.scss" ],
     app: [ rootAssetPath + "/js/app.js",
            rootAssetPath + "/scss/app.scss"],
+    admin: [ rootAssetPath + "/js/admin.js",
+             rootAssetPath + "/scss/app.scss"]
   },
   output: {
     path: __dirname + "/muzsite/static",

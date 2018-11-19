@@ -1,0 +1,24 @@
+<div class="container">
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Year</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="album in albums">
+        <td>{{album.title}}</td>
+        <td>{{album.artist}}</td>
+        <td>{{album.release_year}}</td>
+        <td>
+          <a class="btn" ui-sref="admin.edit_album({id: album.id})">
+            Edit
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

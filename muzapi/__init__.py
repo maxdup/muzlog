@@ -29,8 +29,8 @@ def create_app(config):
     mail = Mail(app)
     db.init_app(app)
 
-    api.add_resource(Album_res, "/api/albums", endpoint="albums")
-    api.add_resource(Album_res, "/api/albums/<string:_id>", endpoint="album")
+    api.add_resource(Album_res, "/api/album", endpoint="albums")
+    api.add_resource(Album_res, "/api/album/<string:_id>", endpoint="album")
 
     app.register_blueprint(muzlog_pages)
 
