@@ -7,5 +7,5 @@ __pycache__/
 config.py
 config_test.py
 
-/muzsite/static/lib
-/muzsite/static/complied
+/node_modules/
+/muzsite/static/

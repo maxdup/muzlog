@@ -1,4 +1,4 @@
-.flashes {
+#flashes {
     position: fixed;
     top: 60px;
     z-index: 5;
@@ -12,18 +12,15 @@
     -webkit-border-radius: 5px;
     -khtml-border-radius: 5px;
     border-radius: 5px;
-}
-.flashes .dismiss {
-    cursor: pointer;
-    color: #555;
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    font-size: 20px;
-}
-.flashes li {
-    margin-left: 30px;
-}
-.flashes.alt {
-    top: 0;
+
+    li { margin-left: 30px; }
+    alt { top: 0; }
+    .dismiss {
+        cursor: pointer;
+        color: #555;
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        font-size: 20px;
+    }
 }

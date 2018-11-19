@@ -7,7 +7,6 @@ from flask_security import Security, MongoEngineUserDatastore, \
     auth_token_required
 from flask_mail import Mail
 from flask_cors import CORS
-import jinja2
 
 db = MongoEngine()
 
@@ -17,17 +16,12 @@ from muzapi.pages import *
 
 
 def create_app(config):
-    app = Flask(__name__, static_folder='../muzsite/static')
+    app = Flask(__name__,
+                template_folder='../muzsite/templates',
+                static_folder='../muzsite/static')
     api = Api(app)
 
     app.config.from_object(config)
-
-    my_loader = jinja2.ChoiceLoader([
-        app.jinja_loader,
-        jinja2.FileSystemLoader('muzsite/templates'),
-    ])
-    app.jinja_loader = my_loader
-
     app.url_map.strict_slashes = True
 
     user_datastore = MongoEngineUserDatastore(db, User, Role)
