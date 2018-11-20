@@ -55,9 +55,10 @@ module.exports = {
       jQuery: 'jquery',
       "window.jQuery": "jquery"
     }),
-    new CopyWebpackPlugin([
-      { from: rootAssetPath + '/partials',
-        to: './partials'}
-    ])
+    new CopyWebpackPlugin([{
+      from: rootAssetPath + '/partials',
+      to: './partials',
+      ignore: [ '*.html~' ]
+    }])
   ]
 }
