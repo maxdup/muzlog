@@ -1,13 +1,15 @@
-require('jquery/dist/jquery.js')
-require('angular/angular.js');
-require('angular-animate/angular-animate.js');
+window.$ = require("expose-loader?$!jquery");
 require('@uirouter/angularjs');
+require('angular-animate/angular-animate.js');
+
+angular.module('yourModule', []);
 
 require('./admin_controller.js');
 require('./resources.js');
 
 module.exports = angular.module('muzApp', [
-  'ui.router', 'ngAnimate', 'muz.adminCtrl', 'muz.resources'])
+  'ui.materialize', 'ui.router', 'ngAnimate',
+  'muz.adminCtrl', 'muz.resources'])
   .config([
     "$locationProvider", "$stateProvider", "$urlRouterProvider",
     function($locationProvider, $stateProvider, $urlRouterProvider,){
@@ -17,9 +19,14 @@ module.exports = angular.module('muzApp', [
           templateUrl: '/static/partials/admin/home.html',
           controller: 'AdminController'
         })
-        .state('admin.edit_album', {
-          url: '/edit/:id',
-          templateUrl: '/static/partials/admin/edit.html',
+        .state('create_album', {
+          url: '/admin/create',
+          templateUrl: '/static/partials/admin/create_album.html',
+          controller: 'CreateAlbumController'
+        })
+        .state('edit_album', {
+          url: '/admin/edit/:id',
+          templateUrl: '/static/partials/admin/edit_album.html',
           controller: 'EditAlbumController'
         })
       $urlRouterProvider.otherwise('/admin', {

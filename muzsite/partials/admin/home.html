@@ -1,4 +1,10 @@
 <div class="container">
+  <div class="fixed-action-btn">
+    <a class="btn-floating btn-large red" ui-sref="create_album">
+      <i class="large material-icons">add</i>
+    </a>
+  </div>
+
   <table>
     <thead>
       <tr>
@@ -14,7 +20,7 @@
         <td>{{album.artist}}</td>
         <td>{{album.release_year}}</td>
         <td>
-          <a class="btn" ui-sref="admin.edit_album({id: album.id})">
+          <a class="btn" ui-sref="edit_album({id: album.id})">
             Edit
           </a>
         </td>

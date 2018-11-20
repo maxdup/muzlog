@@ -18,6 +18,7 @@ class User(db.Document, UserMixin):
     password = db.StringField(max_length=255, nullable=False)
     username = db.StringField(max_length=75, nullable=False)
     bio = db.StringField(max_length=400, nullable=True)
+    color = db.StringField(min_length=7, max_length=7, nullable=True)
 
     avatar = db.StringField(default="")
 
@@ -55,12 +56,22 @@ class Log(db.EmbeddedDocument):
 
 class Album(db.Document):
 
-    artist = db.StringField(max_length=255)
-    title = db.StringField(max_length=255)
+    mbid = db.StringField(max_length=255, unique=True, sparse=True)
+    asin = db.StringField(max_length=255, unique=True, sparse=True)
+
+    artist = db.StringField(required=True)
+    title = db.StringField(required=True)
+
+    label = db.StringField()
+    country = db.StringField()
     release_year = db.IntField()
     release_date = db.DateTimeField()
+
     cover = db.StringField()
 
-    published = db.BooleanField(default=False)
-
     logs = db.ListField(db.EmbeddedDocumentField(Log, default=Log))
+    first_recommended_by = db.ReferenceField(User, nullable=False)
+    recommended = db.BooleanField(default=False)
+
+    published = db.BooleanField(default=False)
+    published_date = db.DateTimeField()
