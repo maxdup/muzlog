@@ -6,56 +6,33 @@ from mongoengine.queryset import DoesNotExist
 from datetime import datetime
 
 from muzapi.models import *
+from muzapi.log import Log_res
 
 
 class Album_res(Resource):
 
-    user_fields = {
-        'id': fields.String,
-        'username': fields.String,
-        'avatar': fields.String,
-    }
-
-    comment_fields = {
-        'id': fields.String,
-        'author': fields.Nested(user_fields),
-        'message': fields.String,
-        'creation_time': fields.DateTime(dt_format='iso8601'),
-
-        'username': db.StringField(),
-    }
-
-    log_fields = {
-        'id': fields.String,
-        'author': fields.Nested(user_fields),
-        'message': fields.String,
-        'creation_time': fields.DateTime(dt_format='iso8601'),
-
-        'recommended': fields.Boolean,
-        'comments': fields.List(fields.Nested(comment_fields)),
-    }
-
-    album_base = {
+    album_fields_base = {
         'id': fields.String,
         'artist': fields.String,
         'title': fields.String,
         'release_year': fields.Integer,
         'cover': fields.String
     }
-    album = {
+
+    album_fields = {
         'mbid': fields.String,
         'asin': fields.String,
         'label': fields.String,
         'release_date': fields.DateTime(dt_format='iso8601'),
-        'logs': fields.List(fields.Nested(log_fields))
+        'logs': fields.List(fields.Nested(Log_res.log_fields))
     }
-    album.update(album_base)
+    album_fields.update(album_fields_base)
 
-    album_fields = {
-        'album': fields.Nested(album)
+    album_render = {
+        'album': fields.Nested(album_fields)
     }
-    albums_fields = {
-        'albums': fields.List(fields.Nested(album_base))
+    albums_render = {
+        'albums': fields.List(fields.Nested(album_fields_base))
     }
 
     def get(self, _id=None):
@@ -66,10 +43,10 @@ class Album_res(Resource):
         '''
         if (_id):
             album = Album.objects(id=_id)
-            return marshal({'album': album[0]}, self.album_fields)
+            return marshal({'album': album[0]}, self.album_render)
         else:
             albums = Album.objects()
-            return marshal({'albums': albums}, self.albums_fields)
+            return marshal({'albums': albums}, self.albums_render)
 
     def post(self, _id=None):
         try:
@@ -79,14 +56,14 @@ class Album_res(Resource):
             if 'mbid' in x and x['mbid'] != '':
                 mbid_album = Album.objects(mbid=x['mbid'])
                 if mbid_album:
-                    return marshal({'album', mbid_album[0]}, self.album_fields)
+                    return marshal({'album', mbid_album[0]}, self.album_render)
                 else:
                     album.mbid = x['mbid']
 
             if 'asin' in x and x['asin'] != '':
                 asin_album = Album.objects(asin=x['asin'])
                 if asin_album:
-                    return marshal({'album': asin_album[0]}, self.album_fields)
+                    return marshal({'album': asin_album[0]}, self.album_render)
                 else:
                     album.asin = x['asin']
 
@@ -125,7 +102,7 @@ class Album_res(Resource):
 
             album.save()
 
-            return marshal({'album': album}, self.album_fields)
+            return marshal({'album': album}, self.album_render)
 
         except Exception as e:
             print(e)

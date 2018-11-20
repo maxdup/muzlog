@@ -1,0 +1,33 @@
+<form>
+  <!-- Message -->
+  <div class="input-field">
+    <textarea id="textarea" ng-model="log.message"
+              class="materialize-textarea"></textarea>
+    <label for="textarea">Message</label>
+  </div>
+
+  <div class="row">
+    <!-- Publish Date -->
+    <div class="input-field col s6">
+      <input input-date type="text" id="log_published"
+             ng-model="log.published_date" format="dd/mm/yyyy"/>
+      <label for="log_published">
+        Publish Date
+      </label>
+    </div>
+
+    <!-- Recommended -->
+    <div class="input-field col s6">
+      <input ng-model="log.recommended"
+             type="checkbox" id="check" />
+      <label for="check">Recommended</label>
+    </div>
+  </div>
+
+
+  <input class="waves-effect waves-light btn" ng-click="save_log(log)"
+         type="submit" value="Save"/>
+  <input class="waves-effect waves-light btn" ng-click="publish_log(log)"
+         type="submit" value="Publish"/>
+
+</form>

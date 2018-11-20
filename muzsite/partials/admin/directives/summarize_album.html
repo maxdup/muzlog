@@ -1,0 +1,19 @@
+<div class="album-summary">
+  <h3>{{ngModel.title}} by {{ngModel.artist ||
+    ngModel['artist-credit'][0].artist.name || 'unknown'}}
+  </h3>
+  <div class="summary">
+  <p>
+    <b>Release date:</b> {{ ngModel.date || ngModel.release.date ||
+    ngModel.release_year || 'unknown'}}<br>
+    <b>Record Label:</b> {{ ngModel.label ||
+    ngModel['label-info'][0].label.name || 'unknown'}}<br>
+    <b>Country:</b> {{ngModel.country  || 'unknown'}}<br>
+    <b>ASIN:</b> {{ngModel.asin || 'unknown'}}<br>
+    <b>MusicBrains ID:</b> {{ngModel.mbid || 'unknown'}}<br>
+  </p>
+  <a ng-if="enable_edit" ui-sref="edit_album({id: ngModel.id})"
+     class="btn-floating btn-large waves-effect waves-light red">
+    <i class="material-icons">edit</i>
+  </a>
+</div>

@@ -6,10 +6,11 @@ angular.module('yourModule', []);
 
 require('./admin_controller.js');
 require('./resources.js');
+require('./directives.js');
 
 module.exports = angular.module('muzApp', [
   'ui.materialize', 'ui.router', 'ngAnimate',
-  'muz.adminCtrl', 'muz.resources'])
+  'muz.adminCtrl', 'muz.resources', 'muz.adminDirectives'])
   .config([
     "$locationProvider", "$stateProvider", "$urlRouterProvider",
     function($locationProvider, $stateProvider, $urlRouterProvider,){
@@ -28,6 +29,11 @@ module.exports = angular.module('muzApp', [
           url: '/admin/edit/:id',
           templateUrl: '/static/partials/admin/edit_album.html',
           controller: 'EditAlbumController'
+        })
+        .state('log_album', {
+          url: '/admin/log/:id',
+          templateUrl: '/static/partials/admin/log_album.html',
+          controller: 'LogAlbumController'
         })
       $urlRouterProvider.otherwise('/admin', {
         url: '/',

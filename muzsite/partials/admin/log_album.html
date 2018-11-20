@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="card" ng-if="album">
+    <div class="card-content">
+     <album-summary ng-model="album" editable>
+      </album-summary>
+    </div>
+  </div>
+
+  <div class="card" ng-if="album" ng-repeat="log in album.logs">
+    <div class="card-content">
+      <h4>{{log.author.username}}'s log</h4>
+      {{log.message}}
+    </div>
+  </div>
+
+  <log-creator ng-if="album" album-id="{{album.id}}"
+               on-create="log_created">
+  </log-creator>
+</div>

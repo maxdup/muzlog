@@ -1,21 +1,26 @@
+body {
+    background: bisque;
+}
 table {
     th {
         font-weight: 600;
     }
 }
-.card {
+
+.album-creator {
     form {
         padding-top: 50px;
         padding-bottom: 50px;
     }
+
 }
-.search-field {
-    .btn {
-        margin-top: 1rem;
-    }
-}
-.album-creator {
+.album-summary {
     .summary {
         margin-bottom: 1rem;
+    }
+    .btn-floating {
+        position: absolute;
+        right: 2rem;
+        bottom: 3rem;
     }
 }

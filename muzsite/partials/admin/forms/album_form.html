@@ -1,0 +1,49 @@
+<form>
+  <!-- Album Title -->
+  <div class="input-field col s12">
+    <input id="album_name" ng-model="album.title" type="text">
+    <label for="album_name">Album Title</label>
+  </div>
+
+  <!-- Artist Name -->
+  <div class="input-field col s12">
+    <input id="artist_name" ng-model="album.artist" type="text">
+    <label for="artist_name">Artist Name</label>
+  </div>
+
+  <!-- Release Date -->
+  <div class="input-field col s12">
+    <input input-date type="text" id="album_released"
+           ng-model="album.release_date" format="dd/mm/yyyy"/>
+    <label for="album_released">
+      Release Date
+    </label>
+  </div>
+
+  <!-- Record Label -->
+  <div class="input-field col s12 m6">
+    <input id="label_name" ng-model="album.label" type="text">
+    <label for="label_name">Record Label (optional)</label>
+  </div>
+
+  <!-- Country -->
+  <div class="input-field col s12 m6">
+    <input id="country" ng-model="album.country" type="text">
+    <label for="country">Country (optional)</label>
+  </div>
+
+  <!-- mbid -->
+  <div class="input-field col s12 m6">
+    <input id="asin" ng-model="album.asin" type="text">
+    <label for="asin">ASIN (optional)</label>
+  </div>
+
+  <!-- asin -->
+  <div class="input-field col s12 m6">
+    <input id="mbid" ng-model="album.mbid" type="text">
+    <label for="mbid">MusicBrainz ID (optional)</label>
+  </div>
+
+  <div class="waves-effect waves-light btn"
+       ng-click="save_album(album)">Submit</div>
+</form>

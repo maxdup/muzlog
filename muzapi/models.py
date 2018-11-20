@@ -45,17 +45,17 @@ class Comment(db.EmbeddedDocument):
     user_name = db.StringField()
 
 
-class Log(db.EmbeddedDocument):
+class Log(db.Document):
     author = db.ReferenceField(User, nullable=False)
     message = db.StringField()
-    creation_time = db.DateTimeField(default=datetime.now())
-
+    published_date = db.DateTimeField(default=datetime.now())
+    published = db.BooleanField(default=False)
     recommended = db.BooleanField(default=False)
+
     comments = db.ListField(db.EmbeddedDocumentField(Comment, default=Comment))
 
 
 class Album(db.Document):
-
     mbid = db.StringField(max_length=255, unique=True, sparse=True)
     asin = db.StringField(max_length=255, unique=True, sparse=True)
 
@@ -69,9 +69,9 @@ class Album(db.Document):
 
     cover = db.StringField()
 
-    logs = db.ListField(db.EmbeddedDocumentField(Log, default=Log))
+    logs = db.ListField(db.ReferenceField(Log))
+
     first_recommended_by = db.ReferenceField(User, nullable=False)
     recommended = db.BooleanField(default=False)
-
     published = db.BooleanField(default=False)
     published_date = db.DateTimeField()
