@@ -4,3 +4,4 @@ flask_restful
 flask-security
 flask-mongoengine
 faker
+python-resize-image

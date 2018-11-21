@@ -11,7 +11,8 @@ from flask_cors import CORS
 db = MongoEngine()
 
 from muzapi.models import User, Role
-from muzapi.albums import Album_res, muzlog_upload
+from muzapi.albums import Album_res
+from muzapi.cover import muzlog_upload
 from muzapi.log import Log_res
 from muzapi.pages import *
 
