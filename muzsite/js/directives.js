@@ -10,23 +10,21 @@ module.exports = angular.module('muz.adminDirectives', [])
         onCreate: '='
       },
      templateUrl: '/static/partials/admin/directives/log_create.html',
-      controller: [
-        "$scope", "Log", function($scope, Log) {
+      controller: ["$scope", "Log", function($scope, Log) {
+        $scope.log = {};
 
-          $scope.log = {};
-
-          $scope.publish_log = function(log){
-            log.published = true;
-            $scope.save_log(log);
-          }
-          $scope.save_log = function(log){
-            log.album_id = $scope.albumId;
-            Log.save(log).$promise.then(function(value){
-              $scope.onCreate(value);
-              $scope.log = {};
-            });
-          }
-        }]
+        $scope.publish_log = function(log){
+          log.published = true;
+          $scope.save_log(log);
+        }
+        $scope.save_log = function(log){
+          log.album_id = $scope.albumId;
+          Log.save(log).$promise.then(function(value){
+            $scope.onCreate(value);
+            $scope.log = {};
+          });
+        }
+      }]
     }
   })
   .directive('logDisplay', function(){
@@ -82,6 +80,9 @@ module.exports = angular.module('muz.adminDirectives', [])
         scope.enable_edit = attrs.editable != undefined;
       },
       templateUrl: '/static/partials/admin/directives/album_summary.html',
+      controller: ["$scope", "conf", function($scope, conf) {
+        $scope.conf = conf;
+      }]
     }
   })
 
@@ -103,39 +104,37 @@ module.exports = angular.module('muz.adminDirectives', [])
         onCreate: '=',
       },
       templateUrl: '/static/partials/admin/directives/album_create.html',
-      controller: [
-        "$scope", "$http", "Album",
-        function($scope, $http, Album) {
-          $scope.album = {};
-          $scope.search = function(search_term){
-            $http.get('http://musicbrainz.org/ws/2/release/?query=' +
-                      search_term + '&fmt=json')
-              .then(function(value){
-                $scope.search_results = value.data.releases;
-              });
-          }
+      controller: ["$scope", "$http", "Album", function($scope, $http, Album) {
+        $scope.album = {};
+        $scope.search = function(search_term){
+          $http.get('http://musicbrainz.org/ws/2/release/?query=' +
+                    search_term + '&fmt=json')
+            .then(function(value){
+              $scope.search_results = value.data.releases;
+            });
+        }
 
-          $scope.select_search_result = function(result){
-            $scope.mb_album = result;
-            $scope.mb_album.mbid = $scope.mb_album.id;
-          }
+        $scope.select_search_result = function(result){
+          $scope.mb_album = result;
+          $scope.mb_album.mbid = $scope.mb_album.id;
+        }
 
-          $scope.unselect_search_result = function(){
-            $scope.mb_album = null;
-          }
+        $scope.unselect_search_result = function(){
+          $scope.mb_album = null;
+        }
 
-          function album_saved(value){
-            if ($scope.onCreate){
-              $scope.album = value;
-              $scope.onCreate(value);
-            }
+        function album_saved(value){
+          if ($scope.onCreate){
+            $scope.album = value;
+            $scope.onCreate(value);
           }
-          $scope.save_album = function(){
-            Album.save($scope.album).$promise.then(album_saved);
-          }
-          $scope.save_brainz_album = function(){
-            Album.save($scope.mb_album).$promise.then(album_saved);
-          }
-        }]
+        }
+        $scope.save_album = function(){
+          Album.save($scope.album).$promise.then(album_saved);
+        }
+        $scope.save_brainz_album = function(){
+          Album.save($scope.mb_album).$promise.then(album_saved);
+        }
+      }]
     }
   });

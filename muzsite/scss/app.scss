@@ -12,16 +12,56 @@ table {
         padding-top: 50px;
         padding-bottom: 50px;
     }
+    .album-summary {
+        margin-top: 30px;
+        margin-right: 20px;
+        margin-left: 20px;
+    }
 
 }
-.album-display, .log-display {
+.album-summary {
+    h3 { margin-top: 0;}
     .summary {
         margin-bottom: 1rem;
-        p {
-            margin-right: 3rem;
+        p { margin-right: 3rem; }
+
+    }
+
+    .cover {
+        >div {
+            position: relative
+        }
+        img {
+            min-height: 100%;
+            width: 100%;
+            height: auto;
+        }
+        .external {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+        img[alt].external:after {
+            background-image: url("/static/images/placeholder.jpg");
+            background-size: cover;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            font-family: 'Helvetica';
+            font-weight: 300;
+            line-height: 2;
+            text-align: center;
+            content: attr(alt);
         }
 
     }
+}
+.album-display, .log-display {
     .btn-floating {
         float:right;
         margin-left: 10px;

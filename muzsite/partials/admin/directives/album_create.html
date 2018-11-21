@@ -34,6 +34,9 @@
                ng-class="active = mb_album.id == release.id"
                ng-click="select_search_result(release)">
               {{release.title}} by {{release['artist-credit'][0].artist.name}}
+              [{{release.media[0].format}}]
+              {{release.country ? ' - ('+release.country+')': ''}}
+              - {{release.date}} {{release.asin ? ' - (asin)': ''}}
             </a>
           </ul>
         </form>

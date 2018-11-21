@@ -1,9 +1,11 @@
-from flask import request, jsonify
+from flask import current_app as app, request, jsonify
 from flask_restful import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted
 from mongoengine.queryset import DoesNotExist
 
 from datetime import datetime
+import requests
+import urllib.request
 
 from muzapi.util import DictDiffer
 from muzapi.models import *
@@ -18,6 +20,7 @@ class Album_res(Resource):
         'title': fields.String,
         'release_year': fields.Integer,
         'cover': fields.String,
+        'thumb': fields.String,
     }
 
     album_fields = {
@@ -106,6 +109,11 @@ class Album_res(Resource):
             elif 'release_year' in x and x['release_year']:
                 album.release_year = x['release_year']
 
+            if album.mbid:
+                covers = downloadBrainzCover(album.mbid)
+                album.cover = covers['cover']
+                album.thumb = covers['thumb']
+
             album.save()
             return marshal({'album': album}, self.album_render)
 
@@ -173,3 +181,24 @@ class Album_res(Resource):
         album.deleted = True
         album.save()
         return (204)
+
+
+def downloadBrainzCover(mbid):
+    thumb_url = 'http://coverartarchive.org/release/' + mbid + '/front-250.jpg'
+    cover_url = 'http://coverartarchive.org/release/' + mbid + '/front-1200.jpg'
+    thumb_filename = mbid + '-thumb.jpg'
+    cover_filename = mbid + '-cover.jpg'
+    r = requests.get(thumb_url)
+    urllib.request.urlretrieve(
+        thumb_url, app.config['UPLOAD_FOLDER'] + thumb_filename)
+    urllib.request.urlretrieve(
+        cover_url, app.config['UPLOAD_FOLDER'] + cover_filename)
+
+    return {'thumb': thumb_filename, 'cover': cover_filename}
+
+
+def uploadCover():
+    if 'file' not in request.files:
+        return 406
+
+    return

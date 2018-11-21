@@ -59,6 +59,10 @@ module.exports = {
       from: rootAssetPath + '/partials',
       to: './partials',
       ignore: [ '*.html~' ]
+    }]),
+    new CopyWebpackPlugin([{
+      from: rootAssetPath + '/images',
+      to: './images'
     }])
   ]
 }

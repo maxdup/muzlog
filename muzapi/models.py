@@ -70,6 +70,7 @@ class Album(db.Document):
     release_date = db.DateTimeField()
 
     cover = db.StringField()
+    thumb = db.StringField()
 
     logs = db.ListField(db.ReferenceField(Log))
 

@@ -1,14 +1,24 @@
 <div class="album-summary">
-  <h3>{{album.title}} by {{album.artist ||
-    album['artist-credit'][0].artist.name || 'unknown'}}
-  </h3>
+  <div class="row">
+    <div class="cover col s3">
+      <div>
+        <img ng-if="album.thumb" ng-src="{{conf.cover_url + album.thumb}}"/>
+        <img class="external" ng-if="!album.thumb" ng-src="{{'http://coverartarchive.org/release/' + album.mbid + '/front-250.jpg'}}" alt="">
+        <img ng-if="!album.thumb" src="/static/images/placeholder.jpg"/>
+      </div>
+    </div>
+    <div class="col s9">
+      <h3>{{album.title}} by {{album.artist ||
+        album['artist-credit'][0].artist.name || 'unknown'}}
+      </h3>
+    </div>
+  </div>
   <a ng-if="enable_edit" ui-sref="edit_album({id: album.id})"
      class="btn-floating btn-large waves-effect waves-light red">
     <i class="material-icons">edit</i>
   </a>
   <div class="summary">
     <p>
-
       <b>Release date:</b> {{ album.date || album.release.date ||
       album.release_year || 'unknown'}}<br>
       <b>Record Label:</b> {{ album.label ||
