@@ -31,7 +31,8 @@ def downloadBrainzCover(mbid):
 
 
 @muzlog_upload.route('/upload_album_cover/<_id>', methods=['POST'])
-# @auth_required
+@login_required
+@roles_accepted('logger')
 def upload_cover(_id=None):
     '''
     Upload an Album cover

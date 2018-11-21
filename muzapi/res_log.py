@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource, fields, marshal, marshal_with, abort
-from flask_security import current_user, roles_accepted
+from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
 from datetime import datetime
@@ -55,6 +55,8 @@ class Log_res(Resource):
         else:
             abort(400)
 
+    @login_required
+    @roles_accepted('logger')
     def post(self, _id=None):
         '''
         Create an ablum log
@@ -109,6 +111,8 @@ class Log_res(Resource):
             print(e)
             abort(400)
 
+    @login_required
+    @roles_accepted('logger')
     def put(self, _id=None):
         '''
         Update an album log
@@ -170,6 +174,8 @@ class Log_res(Resource):
 
         return marshal({'log': log}, self.log_render)
 
+    @login_required
+    @roles_accepted('logger')
     def delete(self, _id=None):  # delete room
         '''
         Delete an ablum log

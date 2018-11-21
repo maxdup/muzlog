@@ -1,14 +1,14 @@
 from flask import current_app as app, request
 from flask_restful import Resource, fields, marshal, marshal_with, abort
-from flask_security import current_user, roles_accepted
+from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
 from datetime import datetime
 
 from muzapi.util import DictDiffer
-from muzapi.cover import downloadBrainzCover
+from muzapi.bp_cover import downloadBrainzCover
 from muzapi.models import *
-from muzapi.log import Log_res
+from muzapi.res_log import Log_res
 
 
 class Album_res(Resource):
@@ -51,6 +51,8 @@ class Album_res(Resource):
             albums = Album.objects(deleted=False)
             return marshal({'albums': albums}, self.albums_render)
 
+    @login_required
+    @roles_accepted('logger')
     def post(self, _id=None):
         '''
         Create an Album
@@ -120,6 +122,8 @@ class Album_res(Resource):
             print(e)
             abort(400)
 
+    @login_required
+    @roles_accepted('logger')
     def put(self, _id=None):
         '''
         Update an Album
@@ -166,6 +170,8 @@ class Album_res(Resource):
 
         return marshal({'album': album}, self.album_render)
 
+    @login_required
+    @roles_accepted('logger')
     def delete(self, _id=None):
         '''
         Update an Album

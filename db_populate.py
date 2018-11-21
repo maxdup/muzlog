@@ -1,14 +1,58 @@
+from flask_security.utils import hash_password
+
 from muzapi import create_app, db
-from muzapi.fake_data import fake_user, fake_album, fake_log, fake_comment
+from muzapi.models import Role, User
+from muzapi.util_fakedata import fake_user, fake_album, fake_log, fake_comment
 
 
-def populate():
-
+def reset_db():
     from muzapi import create_app
     app = create_app('config')
 
     with app.app_context():
         db.connection.drop_database(app.config['MONGODB_DB'])
+
+
+reset_db()
+
+
+def populate_init():
+
+    from muzapi import create_app
+    app = create_app('config')
+
+    with app.app_context():
+
+        if not Role.objects(name="admin"):
+            role_admin = Role(name="admin",
+                              description="includes all permissions")
+            role_admin.save()
+        else:
+            role_admin = Role.objects.get(name="admin")
+
+        if not Role.objects(name="logger"):
+            role_logger = Role(name="logger",
+                               description="includes all permissions")
+            role_logger.save()
+        else:
+            role_logger = Role.objects.get(name="admin")
+
+        user = User(email='admin@muzlog.com',
+                    password=hash_password('changeme'),
+                    username='Admin',
+                    roles=[role_admin, role_logger])
+        user.save()
+
+
+populate_init()
+
+
+def populate_fake():
+
+    from muzapi import create_app
+    app = create_app('config')
+
+    with app.app_context():
 
         main_user = fake_user()
         main_user.save()
@@ -25,4 +69,4 @@ def populate():
             album.save()
 
 
-populate()
+populate_fake()
