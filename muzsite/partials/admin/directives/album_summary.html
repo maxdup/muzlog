@@ -1,0 +1,21 @@
+<div class="album-summary">
+  <h3>{{album.title}} by {{album.artist ||
+    album['artist-credit'][0].artist.name || 'unknown'}}
+  </h3>
+  <a ng-if="enable_edit" ui-sref="edit_album({id: album.id})"
+     class="btn-floating btn-large waves-effect waves-light red">
+    <i class="material-icons">edit</i>
+  </a>
+  <div class="summary">
+    <p>
+
+      <b>Release date:</b> {{ album.date || album.release.date ||
+      album.release_year || 'unknown'}}<br>
+      <b>Record Label:</b> {{ album.label ||
+      album['label-info'][0].label.name || 'unknown'}}<br>
+      <b>Country:</b> {{album.country  || 'unknown'}}<br>
+      <b>ASIN:</b> {{album.asin || 'unknown'}}<br>
+      <b>MusicBrains ID:</b> {{album.mbid || 'unknown'}}<br>
+    </p>
+  </div>
+</div>

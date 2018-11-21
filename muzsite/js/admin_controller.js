@@ -4,7 +4,7 @@ module.exports = angular.module('muz.adminCtrl', [])
     '$scope', 'Album', function($scope, Album) {
       Album.get().$promise.then(function(value){
         $scope.albums = value.albums;
-        console.log($scope.albums);
+        console.log('albums', $scope.albums);
       });
     }])
 
@@ -17,7 +17,6 @@ module.exports = angular.module('muz.adminCtrl', [])
           $scope.album = value;
           console.log('album', $scope.album);
         });
-
     }])
 
   .controller('CreateAlbumController', [
@@ -32,12 +31,18 @@ module.exports = angular.module('muz.adminCtrl', [])
     '$stateParams', '$scope', 'Album', '$http',
     function($stateParams, $scope, Album, $http) {
       $scope.album = {};
-      $scope.log_created = function(value){
-        $scope.album.logs.push(value.log)
-      }
+
       Album.get({'id': $stateParams.id})
         .$promise.then(function(value){
           $scope.album = value.album;
         });
+
+      $scope.log_created = function(value){
+        $scope.album.logs.push(value.log)
+      }
+
+      $scope.log_deleted = function(value){
+        _.remove($scope.album.logs, {id: value.id});
+      }
 
     }])

@@ -1,0 +1,13 @@
+<div class="container">
+
+  <album-display ng-model="album" ng-if="album">
+  </album-display>
+
+  <log-display ng-model="log" ng-repeat="log in album.logs"
+               on-delete="log_deleted(log)">
+  </log-display>
+
+  <log-creator ng-if="album" album-id="{{album.id}}"
+               on-create="log_created">
+  </log-creator>
+</div>

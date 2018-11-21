@@ -1,0 +1,14 @@
+<div class="card log-creator">
+  <div class="card-content">
+    <h4>New Log</h4>
+    <div ng-include="'/static/partials/admin/forms/log_form.html'">
+    </div>
+    <div class="controls">
+      <input class="waves-effect waves-light btn" ng-click="save_log(log)"
+             type="submit" value="Save Draft"/>
+      <input class="waves-effect waves-light btn" ng-click="publish_log(log)"
+             type="submit" value="Publish"/>
+    </div>
+  </div>
+</div>
+

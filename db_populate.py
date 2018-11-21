@@ -14,7 +14,14 @@ def populate():
         main_user.save()
 
         for x in range(0, 100):
-            album = fake_album(main_user)
+            album = fake_album()
+            album.save()
+            album.reload()
+
+            log = fake_log(main_user, album)
+            log.save()
+
+            album.logs.append(log)
             album.save()
 
 

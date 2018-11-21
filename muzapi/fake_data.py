@@ -13,8 +13,9 @@ def fake_user():
     return user
 
 
-def fake_log(author):
+def fake_log(author, album):
     log = Log(author=author,
+              album_id=str(album.id),
               message=fake.text(max_nb_chars=200),
               published_date=fake.date_this_year(before_today=True),
               recommended=(fake.random_int(min=0, max=10) == 6))
@@ -22,16 +23,13 @@ def fake_log(author):
     return log
 
 
-def fake_album(author):
+def fake_album():
     release_date = fake.date_this_century(before_today=True)
-    log = fake_log(author)
-    log.save()
     album = Album(title=fake.text(max_nb_chars=100),
                   artist=fake.text(max_nb_chars=100),
                   release_date=release_date,
                   release_year=release_date.year,
-                  published=True,
-                  logs=[log])
+                  published=True)
 
     return album
 

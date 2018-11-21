@@ -20,21 +20,22 @@ module.exports = angular.module('muzApp', [
           templateUrl: '/static/partials/admin/home.html',
           controller: 'AdminController'
         })
-        .state('create_album', {
-          url: '/admin/create',
-          templateUrl: '/static/partials/admin/create_album.html',
-          controller: 'CreateAlbumController'
-        })
         .state('edit_album', {
-          url: '/admin/edit/:id',
+          url: '/admin/album/edit/:id',
           templateUrl: '/static/partials/admin/edit_album.html',
           controller: 'EditAlbumController'
         })
-        .state('log_album', {
+        .state('create_album', {
+          url: '/admin/album/create',
+          templateUrl: '/static/partials/admin/create_album.html',
+          controller: 'CreateAlbumController'
+        })
+        .state('create_log', {
           url: '/admin/log/:id',
-          templateUrl: '/static/partials/admin/log_album.html',
+          templateUrl: '/static/partials/admin/create_log.html',
           controller: 'LogAlbumController'
         })
+
       $urlRouterProvider.otherwise('/admin', {
         url: '/',
         templateUrl: '/static/partials/admin/home.html',

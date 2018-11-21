@@ -46,10 +46,12 @@ class Comment(db.EmbeddedDocument):
 
 
 class Log(db.Document):
-    author = db.ReferenceField(User, nullable=False)
-    message = db.StringField()
-    published_date = db.DateTimeField(default=datetime.now())
+    author = db.ReferenceField(User, nullable=False)  # todo: add Required=True
+
+    album_id = db.StringField(Required=True)
+    message = db.StringField(Required=True)
     published = db.BooleanField(default=False)
+    published_date = db.DateTimeField(default=datetime.now())
     recommended = db.BooleanField(default=False)
 
     comments = db.ListField(db.EmbeddedDocumentField(Comment, default=Comment))
@@ -71,7 +73,8 @@ class Album(db.Document):
 
     logs = db.ListField(db.ReferenceField(Log))
 
-    first_recommended_by = db.ReferenceField(User, nullable=False)
     recommended = db.BooleanField(default=False)
+    recommended_by = db.ReferenceField(User, nullable=False)
     published = db.BooleanField(default=False)
+    published_by = db.ReferenceField(User, nullable=False)
     published_date = db.DateTimeField()

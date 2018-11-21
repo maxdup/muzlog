@@ -14,13 +14,20 @@ table {
     }
 
 }
-.album-summary {
+.album-display,
+.log-display, .log-creator {
     .summary {
         margin-bottom: 1rem;
+        p {
+            margin-right: 3rem;
+        }
+
     }
     .btn-floating {
-        position: absolute;
-        right: 2rem;
-        bottom: 3rem;
+        float:right;
+        margin-left: 10px;
+    }
+    .controls {
+        text-align: right;
     }
 }

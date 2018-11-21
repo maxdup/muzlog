@@ -1,0 +1,35 @@
+<div class="card log-display">
+  <div class="card-content">
+
+    <h4>{{log.author.username}}'s log {{log.published? '':'(Draft)'}}</h4>
+    <div ng-if="!backup">
+      <a ng-if="enable_edit" ng-click="open_edit()"
+         class="btn-floating btn-large waves-effect waves-light red">
+        <i class="material-icons">edit</i>
+      </a>
+      <p>{{log.message}}</p>
+      <div class="row">
+        <span class="col s6">{{log.published_date | date: medium}}</span>
+        <span class="col s6">{{log.recommended ? 'Recommended': 'Not Recommended'}}</span>
+      </div>
+
+      <input class="waves-effect waves-light btn" ng-click="publish()"
+             type="submit" value="Publish log" ng-if="!log.published">
+      <input class="waves-effect waves-light btn" ng-click="delete_log()"
+             type="submit" value="Delete Draft" ng-if="!log.published"/>
+
+    </div>
+
+    <div ng-if="backup">
+      <div ng-include="'/static/partials/admin/forms/log_form.html'"></div>
+      <div class="controls">
+        <input class="waves-effect waves-light btn" ng-click="cancel_edit()"
+               type="submit" value="Cancel Changes"/>
+        <input class="waves-effect waves-light btn" ng-click="save_changes()"
+               type="submit" value="Save Changes"/>
+
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -5,6 +5,7 @@ from mongoengine.queryset import DoesNotExist
 
 from datetime import datetime
 
+from muzapi.util import DictDiffer
 from muzapi.models import *
 
 
@@ -29,6 +30,7 @@ class Log_res(Resource):
         'id': fields.String,
         'author': fields.Nested(user_fields),
         'message': fields.String,
+        'published': fields.Boolean,
         'published_date': fields.DateTime(dt_format='iso8601'),
 
         'recommended': fields.Boolean,
@@ -43,9 +45,9 @@ class Log_res(Resource):
 
     def get(self, _id=None):
         '''
-        Get ablum reviews
+        Get a specific log
 
-        :param_id: The _id of an Album object
+        :param_id: The _id of a Log object to get
         '''
         if (_id):
             log = Log.objects(id=_id)
@@ -54,6 +56,11 @@ class Log_res(Resource):
             abort(400)
 
     def post(self, _id=None):
+        '''
+        Create an ablum log
+
+        :param_id: (ignored)
+        '''
         try:
             x = request.get_json()
             log = Log()
@@ -75,19 +82,23 @@ class Log_res(Resource):
             else:
                 log.published_date = datetime.now()
 
-            log.save()
-            log.reload()
-
             if 'album_id' in x and x['album_id'] != '':
                 album = Album.objects.get(id=x['album_id'])
-                album.logs.append(log)
+                if album:
+                    log.album_id = str(album.id)
+                    log.save()
+                    log.reload()
+                    album.logs.append(log)
+                else:
+                    abort(404)
 
                 if not album.recommended and log.recommended:
                     album.recommended = log.recommended
-                    #album.first_recommended_by = current_user.id
+                    album.recommended_by = log.author
 
                 if not album.published and log.published:
                     album.published = True
+                    album.published_by = log.author
                     album.published_date = log.published_date
 
                 album.save()
@@ -97,3 +108,87 @@ class Log_res(Resource):
         except Exception as e:
             print(e)
             abort(400)
+
+    def put(self, _id):
+        '''
+        Update an ablum log
+
+        :param_id: The _id of a Log object to update
+        '''
+        if (_id):
+            log = Log.objects.get(id=_id)
+        else:
+            abort(400)
+
+        content = request.get_json()
+
+        if 'author' in content:
+            del content['author']
+        if 'comments' in content:
+            del content['comments']
+
+        delta = DictDiffer(content, log.to_mongo()).changed()
+
+        if 'published' in delta or \
+           'recommended' in delta:
+            album = Album.objects.get(id=log.album_id)
+            if not album:
+                abort(400)
+
+        if 'published' in delta:
+            still_published = False
+            for l in album.logs:
+                if l.published:
+                    still_published = True
+                    album.published = True
+                    album.published_by = l.author
+                    break
+
+            if not still_published:
+                album.published = False
+                album.published_by = None
+            album.save()
+
+        if 'recommended' in delta:
+            still_recommended = False
+            for l in album.logs:
+                if l.recommended:
+                    still_recommended = True
+                    album.recommended = True
+                    album.recommended_by = l.author
+                    break
+
+            if not still_recommended:
+                album.recommended = False
+                album.recommended_by = None
+            album.save()
+
+        log.modify(**content)
+        log.save()
+
+        return marshal({'log': log}, self.log_render)
+
+    def delete(self, _id=None):  # delete room
+        '''
+        Delete an ablum log
+
+        :param_id: The _id of a Log object to delete
+        '''
+        if (_id):
+            log = Log.objects.get(id=_id)
+            album = Album.objects.get(id=log.album_id)
+        else:
+            abort(400)
+
+        if not log or not album:
+            abort(400)
+
+        if log.published:
+            abort(400)
+
+        album.logs = [l for l in album.logs if l.id != log.id]
+
+        album.save()
+        log.delete()
+
+        return (204)

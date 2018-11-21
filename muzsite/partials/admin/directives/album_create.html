@@ -39,8 +39,8 @@
         </form>
       </div>
 
-      <div ng-if="mb_album" ng-model="mb_album">
-        <album-summary ng-model="mb_album"></album-summary>
+      <div ng-if="mb_album">
+        <album-summary album="mb_album"></album-summary>
 
         <a class="waves-effect waves-light btn"
            ng-click="unselect_search_result()">

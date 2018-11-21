@@ -1,17 +1,6 @@
+_ = require('lodash');
 module.exports = angular.module('muz.adminDirectives', [])
-  .directive('albumSummary', function() {
-    return {
-      restrict: 'EA',
-      replace: true,
-      scope: {
-	    ngModel: "=",
-      },
-      link : function(scope, element, attrs){
-        scope.enable_edit = attrs.editable != undefined;
-      },
-      templateUrl: '/static/partials/admin/directives/summarize_album.html',
-    }
-  })
+
   .directive('logCreator', function(){
     return {
       restrict: 'EA',
@@ -20,7 +9,7 @@ module.exports = angular.module('muz.adminDirectives', [])
         albumId: "@",
         onCreate: '='
       },
-      templateUrl: '/static/partials/admin/directives/log_album.html',
+     templateUrl: '/static/partials/admin/directives/log_create.html',
       controller: [
         "$scope", "Log", function($scope, Log) {
 
@@ -37,18 +26,83 @@ module.exports = angular.module('muz.adminDirectives', [])
               $scope.log = {};
             });
           }
-        }],
+        }]
     }
   })
+  .directive('logDisplay', function(){
+    return {
+      restrict: 'EA',
+      replace: true,
+      scope: {
+        log: '=ngModel',
+        onDelete: '&',
+      },
+      templateUrl: '/static/partials/admin/directives/log_display.html',
+      controller: ["$scope", "Log", function($scope, Log) {
+
+        $scope.enable_edit = true;
+        $scope.open_edit = function(){
+          $scope.backup = _.cloneDeep($scope.log);
+        }
+        $scope.cancel_edit = function(){
+          $scope.log = $scope.backup;
+          $scope.backup = null;
+        }
+        $scope.save_changes = function(){
+          Log.update($scope.log)
+            .$promise.then(function(value){
+              $scope.log = value.log;
+              $scope.backup = null;
+            })
+        }
+        $scope.publish = function(){
+          Log.update({id: $scope.log.id, published: true})
+            .$promise.then(function(value){
+              $scope.log = _.extend($scope.log, value.log);
+            }, function(err){
+              $scope.log.published = false;
+            })
+        }
+        $scope.delete_log = function(){
+          if (confirm("This log will be deleted")){
+            Log.delete({id:$scope.log.id})
+              .$promise.then($scope.onDelete);
+          }
+        }
+      }]
+    }
+  })
+
+  .directive('albumSummary', function() {
+    return {
+      restrict: 'EA',
+      replace: true,
+      scope: { album: "=ngModel" },
+      link : function(scope, element, attrs){
+        scope.enable_edit = attrs.editable != undefined;
+      },
+      templateUrl: '/static/partials/admin/directives/album_summary.html',
+    }
+  })
+
+  .directive('albumDisplay', function(){
+    return {
+      restrict: 'EA',
+      replace: true,
+      scope: { album: '=ngModel', },
+      templateUrl: '/static/partials/admin/directives/album_display.html',
+    }
+  })
+
   .directive('albumCreator', function() {
     return {
       restrict: 'EA',
       replace: true,
       scope: {
-        ngModel: "=",
+        album: "=ngModel",
         onCreate: '&',
       },
-      templateUrl: '/static/partials/admin/directives/create_album.html',
+      templateUrl: '/static/partials/admin/directives/album_create.html',
       controller: [
         "$scope", "$http", "Album",
         function($scope, $http, Album) {
@@ -71,7 +125,7 @@ module.exports = angular.module('muz.adminDirectives', [])
 
           function album_saved(value){
             if ($scope.onCreate){
-              $scope.ngModel = value;
+              $scope.album = value;
               $scope.onCreate(value);
             }
           }
