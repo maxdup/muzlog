@@ -20,8 +20,10 @@
   </a>
   <div class="summary">
     <p>
-      <b>Release date:</b> {{ album.date || album.release.date ||
-      album.release_year || 'unknown'}}<br>
+      <b>Release date:</b> <span ng-if="album.date || album.release_date">
+        {{ album.date || album.release_date | date: medium : UTC}}</span>
+      <span ng-if="!album.date && !album.release_date">
+        {{album.release_year || 'unknown'}}</span><br>
       <b>Record Label:</b> {{ album.label ||
       album['label-info'][0].label.name || 'unknown'}}<br>
       <b>Country:</b> {{album.country  || 'unknown'}}<br>
