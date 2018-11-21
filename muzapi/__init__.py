@@ -11,7 +11,7 @@ from flask_cors import CORS
 db = MongoEngine()
 
 from muzapi.models import User, Role
-from muzapi.albums import Album_res
+from muzapi.albums import Album_res, muzlog_upload
 from muzapi.log import Log_res
 from muzapi.pages import *
 
@@ -36,6 +36,7 @@ def create_app(config):
     api.add_resource(Log_res, "/api/log/<string:_id>", endpoint="log")
 
     app.register_blueprint(muzlog_pages)
+    app.register_blueprint(muzlog_upload)
 
     CORS(app)
     return app

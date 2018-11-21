@@ -2,8 +2,6 @@ window.$ = require("expose-loader?$!jquery");
 require('@uirouter/angularjs');
 require('angular-animate/angular-animate.js');
 
-angular.module('yourModule', []);
-
 require('./admin_controller.js');
 require('./resources.js');
 require('./directives.js');

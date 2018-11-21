@@ -1,15 +1,19 @@
-from flask import current_app as app, request, jsonify
+from flask import current_app as app, Blueprint, request, jsonify
 from flask_restful import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted
 from mongoengine.queryset import DoesNotExist
 
-from datetime import datetime
+import os
+import uuid
 import requests
 import urllib.request
+from datetime import datetime
 
 from muzapi.util import DictDiffer
 from muzapi.models import *
 from muzapi.log import Log_res
+
+muzlog_upload = Blueprint('muzlog_upload', __name__)
 
 
 class Album_res(Resource):
@@ -136,6 +140,7 @@ class Album_res(Resource):
 
         content = request.get_json()
 
+        # Don't interfere with reference fields
         if 'logs' in content:
             del content['logs']
         if 'recommended' in content:
@@ -155,11 +160,13 @@ class Album_res(Resource):
 
         delta = DictDiffer(content, album.to_mongo()).changed()
 
+        # Manually update release date
         if 'release_date' in delta:
             date = datetime.strptime(content['release_date'], "%d/%m/%Y")
             content['release_date'] = date
             content['release_year'] = date.year
 
+        # Automatically save everything else
         album.modify(**content)
         album.save()
 
@@ -197,8 +204,43 @@ def downloadBrainzCover(mbid):
     return {'thumb': thumb_filename, 'cover': cover_filename}
 
 
-def uploadCover():
+@muzlog_upload.route('/upload_album_cover/<_id>', methods=['POST'])
+# @auth_required
+def upload_cover(_id=None):
+    '''
+    Upload an Album cover
+
+    :param_id: The _id of an Album object to add a cover to
+    '''
+    if (_id):
+        album = Album.objects.get(id=_id)
+        if not album:
+            abort(404)
+    else:
+        abort(400)
+
     if 'file' not in request.files:
         return 406
 
-    return
+    cover = request.files['file']
+    if cover.filename == '':
+        return 406
+
+    file_id = str(uuid.uuid4())
+    cover_filename = file_id + '-cover.jpg'
+
+    # Save file locally
+    try:
+        cover.save(os.path.join(app.config['UPLOAD_FOLDER'], cover_filename))
+        cover.stream.seek(0)
+
+        album.cover = cover_filename
+        # todo: thumbnail resize
+        album.thumb = cover_filename
+
+        album.save()
+    except Exception as e:
+        print(e)
+        abort(500)
+
+    return (cover_filename, 200)

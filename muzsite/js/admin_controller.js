@@ -1,4 +1,5 @@
-module.exports = angular.module('muz.adminCtrl', [])
+require('ng-file-upload');
+module.exports = angular.module('muz.adminCtrl', ['ngFileUpload'])
 
   .controller('AdminController', [
     '$scope', 'Album', function($scope, Album) {
@@ -9,8 +10,9 @@ module.exports = angular.module('muz.adminCtrl', [])
     }])
 
   .controller('EditAlbumController', [
-    '$stateParams', '$scope', 'Album', '$state',
-    function($stateParams, $scope, Album, $state) {
+    '$state', '$stateParams', '$scope', 'Album', 'Upload', '$q', 'conf',
+    function($state, $stateParams, $scope, Album, Upload, $q, conf) {
+      $scope.conf = conf;
 
       Album.get({id:$stateParams.id})
         .$promise.then(function(value){
@@ -20,8 +22,19 @@ module.exports = angular.module('muz.adminCtrl', [])
       $scope.save_changes = function(){
         Album.update($scope.album)
           .$promise.then(function(value){
-            $scope.album = value.album;
-            $state.go('create_log', {'id': value.album.id});
+            if ($scope.cover_file){
+              upload($scope.cover_file, value.album.id)
+                .then(function(result){
+                  $scope.album = result.album;
+                  $state.go('create_log', {'id': value.album.id});
+                }, function(){
+                  $state.go('create_log', {'id': value.album.id});
+                })
+              $scope.album = value.album;
+            } else {
+              $scope.album = value.album;
+              $state.go('create_log', {'id': value.album.id});
+            }
           })
       }
 
@@ -33,6 +46,23 @@ module.exports = angular.module('muz.adminCtrl', [])
             });
         }
       }
+      $scope.select_file = function(files){
+        if (files.length > 0){
+          $scope.cover_file = files[0];
+        }
+      }
+      var upload = function(cover_file, album_id){
+        var d = $q.defer();
+        Upload.upload({
+          url: '/upload_album_cover/' + album_id,
+          data: { file: cover_file }
+        }).then(function (value) {
+          d.resolve(value);
+        }, function(err){
+          d.reject(err)
+        });
+        return d.promise;
+      };
     }])
 
   .controller('CreateAlbumController', [

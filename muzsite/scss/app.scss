@@ -6,7 +6,6 @@ table {
         font-weight: 600;
     }
 }
-
 .album-creator {
     form {
         padding-top: 50px;
@@ -27,39 +26,6 @@ table {
 
     }
 
-    .cover {
-        >div {
-            position: relative
-        }
-        img {
-            min-height: 100%;
-            width: 100%;
-            height: auto;
-        }
-        .external {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-        }
-        img[alt].external:after {
-            background-image: url("/static/images/placeholder.jpg");
-            background-size: cover;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #fff;
-            font-family: 'Helvetica';
-            font-weight: 300;
-            line-height: 2;
-            text-align: center;
-            content: attr(alt);
-        }
-
-    }
 }
 .album-display, .log-display {
     .btn-floating {
@@ -69,4 +35,38 @@ table {
 }
 .btn-controls {
     text-align: right;
+}
+
+.cover {
+    >div {
+        position: relative
+    }
+    img {
+        min-height: 100%;
+        width: 100%;
+        height: auto;
+    }
+    .external {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+    img[alt].external:after {
+        background-image: url("/static/images/placeholder.jpg");
+        background-size: cover;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        font-family: 'Helvetica';
+        font-weight: 300;
+        line-height: 2;
+        text-align: center;
+        content: attr(alt);
+    }
+
 }

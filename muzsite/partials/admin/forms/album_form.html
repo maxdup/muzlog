@@ -1,4 +1,25 @@
 <form>
+
+  <!-- Cover Art -->
+  <div class="row">
+    <div class="cover col s3" ng-if="album.thumb">
+      <div>
+        <img ng-src="{{conf.cover_url + album.thumb}}"/>
+      </div>
+    </div>
+    <div class="file-field input-field col"
+         ng-class="{'s9': album.thumb}"
+         ngf-select="select_file($files)">
+      <div class="btn">
+        <span>File</span>
+      </div>
+      <div class="file-path-wrapper">
+        <input disabled class="file-path validate" type="text"
+               ng-value="cover_file.name">
+      </div>
+    </div>
+  </div>
+
   <!-- Album Title -->
   <div class="input-field col s12">
     <input id="album_name" ng-model="album.title" type="text">
