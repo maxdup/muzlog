@@ -109,14 +109,16 @@ class Log_res(Resource):
             print(e)
             abort(400)
 
-    def put(self, _id):
+    def put(self, _id=None):
         '''
-        Update an ablum log
+        Update an album log
 
         :param_id: The _id of a Log object to update
         '''
         if (_id):
             log = Log.objects.get(id=_id)
+            if not log:
+                abort(404)
         else:
             abort(400)
 
@@ -177,10 +179,9 @@ class Log_res(Resource):
         if (_id):
             log = Log.objects.get(id=_id)
             album = Album.objects.get(id=log.album_id)
+            if not log or not album:
+                abort(400)
         else:
-            abort(400)
-
-        if not log or not album:
             abort(400)
 
         if log.published:

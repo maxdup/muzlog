@@ -100,12 +100,13 @@ module.exports = angular.module('muz.adminDirectives', [])
       replace: true,
       scope: {
         album: "=ngModel",
-        onCreate: '&',
+        onCreate: '=',
       },
       templateUrl: '/static/partials/admin/directives/album_create.html',
       controller: [
         "$scope", "$http", "Album",
         function($scope, $http, Album) {
+          $scope.album = {};
           $scope.search = function(search_term){
             $http.get('http://musicbrainz.org/ws/2/release/?query=' +
                       search_term + '&fmt=json')

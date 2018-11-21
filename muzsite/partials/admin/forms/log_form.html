@@ -16,12 +16,14 @@
       </label>
     </div>
 
-    <!-- Recommended -->
+    <!-- Published -->
     <div class="input-field col s4" ng-if="backup.published">
       <input ng-model="log.published"
              type="checkbox" id="check" />
       <label for="check">Published</label>
     </div>
+
+    <!-- Recommended -->
     <div class="input-field col s4">
       <input ng-model="log.recommended"
              type="checkbox" id="check" />

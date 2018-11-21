@@ -78,3 +78,5 @@ class Album(db.Document):
     published = db.BooleanField(default=False)
     published_by = db.ReferenceField(User, nullable=False)
     published_date = db.DateTimeField()
+
+    deleted = db.BooleanField(default=False)

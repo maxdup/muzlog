@@ -40,7 +40,7 @@
       </div>
 
       <div ng-if="mb_album">
-        <album-summary album="mb_album"></album-summary>
+        <album-summary ng-model="mb_album"></album-summary>
 
         <a class="waves-effect waves-light btn"
            ng-click="unselect_search_result()">
@@ -56,6 +56,10 @@
     <!-- Create manually -->
     <div id="tab-manual">
       <div ng-include="'/static/partials/admin/forms/album_form.html'"></div>
+      <div class="btn-controls">
+        <input class="waves-effect waves-light btn" ng-click="save_album()"
+               type="submit" value="Submit"/>
+      </div>
     </div>
   </div>
 </div>

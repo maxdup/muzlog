@@ -14,8 +14,7 @@ table {
     }
 
 }
-.album-display,
-.log-display, .log-creator {
+.album-display, .log-display {
     .summary {
         margin-bottom: 1rem;
         p {
@@ -27,7 +26,7 @@ table {
         float:right;
         margin-left: 10px;
     }
-    .controls {
-        text-align: right;
-    }
+}
+.btn-controls {
+    text-align: right;
 }
