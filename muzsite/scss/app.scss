@@ -55,6 +55,7 @@ table {
     img[alt].external:after {
         background-image: url("/static/images/placeholder.jpg");
         background-size: cover;
+        max-height: 400px;
         display: block;
         position: absolute;
         top: 0;
@@ -68,5 +69,4 @@ table {
         text-align: center;
         content: attr(alt);
     }
-
 }

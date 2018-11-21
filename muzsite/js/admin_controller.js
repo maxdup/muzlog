@@ -37,6 +37,9 @@ module.exports = angular.module('muz.adminCtrl', ['ngFileUpload'])
             }
           })
       }
+      $scope.cancel_changes = function(){
+        $state.go('create_log', {'id': $scope.album.id});
+      }
 
       $scope.delete_album = function(){
         if (confirm("This album will be deleted")){
@@ -46,23 +49,22 @@ module.exports = angular.module('muz.adminCtrl', ['ngFileUpload'])
             });
         }
       }
+
       $scope.select_file = function(files){
         if (files.length > 0){
           $scope.cover_file = files[0];
         }
       }
+
       var upload = function(cover_file, album_id){
-        var d = $q.defer();
-        Upload.upload({
-          url: '/upload_album_cover/' + album_id,
-          data: { file: cover_file }
-        }).then(function (value) {
-          d.resolve(value);
-        }, function(err){
-          d.reject(err)
+        return $q(function(resolve, reject) {
+          Upload.upload({
+            url: '/upload_album_cover/' + album_id,
+            data: { file: cover_file }})
+            .then(resolve,reject);
         });
-        return d.promise;
       };
+
     }])
 
   .controller('CreateAlbumController', [

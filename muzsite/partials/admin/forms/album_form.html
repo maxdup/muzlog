@@ -2,13 +2,17 @@
 
   <!-- Cover Art -->
   <div class="row">
-    <div class="cover col s3" ng-if="album.thumb">
+    <div class="cover col s3">
       <div>
-        <img ng-src="{{conf.cover_url + album.thumb}}"/>
+        <img ngf-thumbnail="cover_file || '/static/images/placeholder.jpg'"
+             ng-if="cover_file">
+        <img ng-src="{{conf.cover_url + album.thumb}}"
+             ng-if="album.thumb && !cover_file"/>
       </div>
     </div>
     <div class="file-field input-field col"
-         ng-class="{'s9': album.thumb}"
+         ng-class="{'s9': album.thumb || cover_file,
+                   's12': !album.thumb && !cover_file}"
          ngf-select="select_file($files)">
       <div class="btn">
         <span>File</span>
