@@ -12,8 +12,13 @@
         </a>
         <h3>{{profile.username}}</h3>
         <p>{{profile.bio}}</p>
-        <p class="roles" ng-repeat="role in profile.roles">
-          {{role}}<font ng-show="!$last">,</font>
+        <p class="extra" ng-if="profile.email">
+          <span class="email">{{profile.email}}</span>
+          <span class="roles" ng-repeat="role in profile.roles">
+            {{role}}<font ng-show="!$last">,</font>
+          </span>
+        </p>
+
         </p>
       </div>
     </div>

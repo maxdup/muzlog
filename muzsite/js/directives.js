@@ -10,7 +10,7 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
         albumId: "@",
         onCreate: '='
       },
-     templateUrl: '/static/partials/admin/directives/log_create.html',
+     templateUrl: '/static/partials/directives/log_create.html',
       controller: ["$scope", "Log", function($scope, Log) {
         $scope.log = {};
 
@@ -36,7 +36,7 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
         log: '=ngModel',
         onDelete: '&',
       },
-      templateUrl: '/static/partials/admin/directives/log_display.html',
+      templateUrl: '/static/partials/directives/log_display.html',
       controller: ["$scope", "Log", function($scope, Log) {
 
         $scope.enable_edit = true;
@@ -80,7 +80,7 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
       link : function(scope, element, attrs){
         scope.enable_edit = attrs.editable != undefined;
       },
-      templateUrl: '/static/partials/admin/directives/album_summary.html',
+      templateUrl: '/static/partials/directives/album_summary.html',
       controller: ["$scope", "conf", function($scope, conf) {
         $scope.conf = conf;
       }]
@@ -92,7 +92,7 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
       restrict: 'EA',
       replace: true,
       scope: { album: '=ngModel', },
-      templateUrl: '/static/partials/admin/directives/album_display.html',
+      templateUrl: '/static/partials/directives/album_display.html',
     }
   })
   .directive('profileDisplay', function(){
@@ -102,7 +102,7 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
       scope: {
         profile: '=ngModel',
       },
-      templateUrl: '/static/partials/admin/directives/profile_display.html',
+      templateUrl: '/static/partials/directives/profile_display.html',
       controller: [
         "$scope", "Profile", "conf", 'UploadService',
         function($scope, Profile, conf, UploadService) {
@@ -143,6 +143,14 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
         }]
     }
   })
+  .directive('avatarDisplay', function(){
+    return {
+      restrict: 'EA',
+      replace: true,
+      scope: { profile: '=ngModel', },
+      templateUrl: '/static/partials/directives/profile_avatar.html',
+    }
+  })
 
   .directive('albumCreator', function() {
     return {
@@ -152,7 +160,7 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
         album: "=ngModel",
         onCreate: '=',
       },
-      templateUrl: '/static/partials/admin/directives/album_create.html',
+      templateUrl: '/static/partials/directives/album_create.html',
       controller: [
         "$state", "$scope", "$http", "Album", "Upload", "conf", "$q",
         function($state, $scope, $http, Album, Upload, conf, $q) {

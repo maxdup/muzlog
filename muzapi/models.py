@@ -28,7 +28,7 @@ class User(db.Document, UserMixin):
                           unique=True, sparse=True)
     password = db.StringField(max_length=255, nullable=False)
 
-    profile = db.EmbeddedDocumentField(UserProfile)
+    profile = db.EmbeddedDocumentField(UserProfile, default=UserProfile)
 
     # handled by flask-security
     active = db.BooleanField(default=True)

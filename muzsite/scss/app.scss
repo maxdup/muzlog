@@ -16,7 +16,6 @@ table {
         margin-right: 20px;
         margin-left: 20px;
     }
-
 }
 .album-summary {
     h3 { margin-top: 0;}
@@ -34,9 +33,12 @@ table {
     }
 }
 .profile-display {
-    p.roles {
-        font-weight: 600;
+    p.extra {
         margin-top: 20px;
+        .email {
+            font-weight: 600;
+            margin-right: 10px;
+        }
     }
 }
 .btn-controls {
@@ -78,5 +80,41 @@ table {
 .avatar {
 }
 .cover {
- 
+}
+
+nav {
+    .avatar {
+        float: right;
+        position: relative;
+        height: 56px;
+        width: 56px;
+
+        @media only screen and (min-width: 601px){
+            height: 64px;
+            width: 64px;
+        }
+        .border {
+            border-radius: 50%;
+            position: absolute;
+            background: black;
+            height: 85%;
+            width: 85%;
+            top: 7.5%;
+            left: 7.5%;
+            right: 7.5%;
+            bottom: 7.5%;
+            z-index: 0;
+        }
+        img {
+            border-radius: 50%;
+            position: absolute;
+            height: 84%;
+            width: 84%;
+            top: 8%;
+            left: 8%;
+            right: 8%;
+            bottom: 8%;
+            z-index: 1;
+        }
+    }
 }
