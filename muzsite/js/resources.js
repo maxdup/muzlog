@@ -36,8 +36,10 @@ module.exports = angular.module('muz.resources',['ngResource', 'ngFileUpload'])
   return {
     response: function(response){
 
-      if (response.config.method == 'PUT'){
-        if (response.status == 200 && response.data.profile){
+      if (response.config.method == 'PUT' ||
+          response.config.method == 'POST'){
+        if (response.status == 200 && response.data.profile &&
+            response.data.profile.id == $rootScope.profile.id){
           $rootScope.profile = response.data.profile;
         }
       }
@@ -45,7 +47,7 @@ module.exports = angular.module('muz.resources',['ngResource', 'ngFileUpload'])
         if (response.status == 200 && response.data.profile){
           if (response.config.url == '/api/profile/me' ||
               response.data.profile.id == $rootScope.profile.id){
-            $rootScope.profile = response.data.profile;
+            $rootScope.profile = _.cloneDeep(response.data.profile);
           }
         }
       }

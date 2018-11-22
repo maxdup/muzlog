@@ -43,10 +43,12 @@ class User_res(Resource):
                 user = User.objects.get(id=_id)
                 return marshal({'profile': user}, self.user_render)
         else:
-            if current_user.has_role:
+            if current_user.has_role('admin'):
                 users = User.objects()
+            else:
+                log_role = Role.objects.get(name="logger")
+                users = User.objects.filter(roles__contains=log_role)
             return marshal({'profiles': users}, self.users_render)
-        return
 
     @login_required
     @roles_accepted('logger', 'admin')

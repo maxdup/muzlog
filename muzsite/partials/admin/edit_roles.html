@@ -1,0 +1,30 @@
+<div class="container role-editor">
+  <div class="card">
+    <div class="card-content">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>username</th>
+            <th ng-repeat="role in roles">{{role}}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="profile in profiles">
+            <td>{{profile.email}}</td>
+            <td>{{profile.username}}</td>
+            <td ng-repeat="role in roles">
+              <i ng-click="remove_role(profile, role)"
+                 ng-show="profile.roles.indexOf(role) != -1"
+                 class="large material-icons">check</i>
+              <i ng-click="add_role(profile, role)"
+                 ng-show="profile.roles.indexOf(role) == -1"
+                 class="large material-icons">close</i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

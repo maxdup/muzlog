@@ -2,11 +2,14 @@
   <div class="card-content">
 
     <div ng-if="!backup" class="row">
-      <div class="col s3 avatar">
-        <img ng-src="{{conf.img_url + profile.thumb}}">
+      <div class="col s2 avatar" >
+        <img ng-if="profile.thumb" ng-src="{{conf.img_url + profile.thumb}}">
+        <img ng-if="!profile.thumb" src="/static/images/user_placeholder.jpg">
       </div>
-      <div class="col s9">
-        <a ng-if="enable_edit" ng-click="open_edit()"
+      <div class="col s10">
+        <a ng-click="open_edit()"
+           ng-if="$root.profile.roles.indexOf('admin') != -1 ||
+              $root.profile.id == profile.id"
            class="btn-floating btn-large waves-effect waves-light red">
           <i class="material-icons">edit</i>
         </a>

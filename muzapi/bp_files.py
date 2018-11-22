@@ -87,7 +87,6 @@ def upload_avatar(_id=None):
 
     :param_id: The _id of a Profile object to add an avatar to
     '''
-    print('plz')
     if 'file' not in request.files or not _id:
         abort(406)
 
@@ -111,7 +110,6 @@ def upload_avatar(_id=None):
         user.profile.avatar = avatar_filename
         user.profile.thumb = thumb_filename
         user.save()
-        print('user saved')
     else:
         abort(500)
 

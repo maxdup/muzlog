@@ -104,8 +104,8 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
       },
       templateUrl: '/static/partials/directives/profile_display.html',
       controller: [
-        "$scope", "Profile", "conf", 'UploadService',
-        function($scope, Profile, conf, UploadService) {
+        "$state", "$scope", "Profile", "conf", 'UploadService',
+        function($state, $scope, Profile, conf, UploadService) {
           $scope.conf = conf;
           $scope.enable_edit = true;
           $scope.open_edit = function(){
@@ -139,6 +139,9 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
           $scope.cancel_changes = function(){
             $scope.profile = $scope.backup;
             $scope.backup = null;
+          }
+          $scope.change_roles = function(){
+            $state.go('edit_roles',{id: $scope.profile.id})
           }
         }]
     }

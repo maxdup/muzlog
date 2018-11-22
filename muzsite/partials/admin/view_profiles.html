@@ -1,4 +1,10 @@
 <div class="container">
+  <div class="fixed-action-btn"
+       ng-if="$root.profile.roles.indexOf('admin') != -1">
+    <a class="btn-floating btn-large red" ui-sref="edit_roles">
+      <i class="large material-icons">verified_user</i>
+    </a>
+  </div>
   <profile-display ng-model="profile" ng-repeat="profile in profiles">
   </profile-display>
 </div>

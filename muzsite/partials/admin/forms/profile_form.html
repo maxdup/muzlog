@@ -1,21 +1,18 @@
 <form>
-
-
   <div class="row">
     <!-- Avatar Art -->
-    <div class="cover col s3">
+    <div class="cover col s2">
       <div>
-        <img ngf-thumbnail="avatar_file || '/static/images/placeholder.jpg'"
-             ng-if="avatar_file">
+        <img ngf-thumbnail="avatar_file || '/static/images/user_placeholder.jpg'"
+             ng-if="!profile.thumb">
         <img ng-src="{{conf.img_url + profile.thumb}}"
              ng-if="profile.thumb && !avatar_file"/>
       </div>
     </div>
-    <div class="col" ng-class="{'s9': profile.thumb || avatar_file,
-                               's12': !profile.thumb && !avatar_file}">
+    <div class="col s10">
       <div class="file-field input-field"
-
            ngf-select="select_file($files)">
+
         <div class="btn">
           <span>Select Avatar</span>
         </div>

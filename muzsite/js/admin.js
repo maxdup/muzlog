@@ -45,8 +45,8 @@ module.exports = angular.module('muzApp', [
           controller: 'EditProfileController'
         })
         .state('edit_roles', {
-          url: '/cms/roles/:id',
-          templateUrl: '/static/partials/admin/roles.html',
+          url: '/cms/roles',
+          templateUrl: '/static/partials/admin/edit_roles.html',
           controller: 'EditRolesController'
         })
 
