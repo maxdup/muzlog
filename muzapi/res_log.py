@@ -7,19 +7,14 @@ from datetime import datetime
 
 from muzapi.util import DictDiffer
 from muzapi.models import *
+from muzapi.res_user import User_res
 
 
 class Log_res(Resource):
 
-    user_fields = {
-        'id': fields.String,
-        'username': fields.String,
-        'avatar': fields.String,
-    }
-
     comment_fields = {
         'id': fields.String,
-        'author': fields.Nested(user_fields),
+        'author': fields.Nested(User_res.user_fields),
         'message': fields.String,
         'creation_time': fields.DateTime(dt_format='iso8601'),
 
@@ -28,7 +23,7 @@ class Log_res(Resource):
 
     log_fields = {
         'id': fields.String,
-        'author': fields.Nested(user_fields),
+        'author': fields.Nested(User_res.user_fields),
         'message': fields.String,
         'published': fields.Boolean,
         'published_date': fields.DateTime(dt_format='iso8601'),

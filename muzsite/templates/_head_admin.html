@@ -11,6 +11,6 @@
 
   <base href="/cms">
 </head>
-<body ng-app="muzApp">
+<body ng-app="muzApp" ng-controller="RootController">
   {% include "_messages.html" %}
-  {% include "_nav.html"%}
+  <div ng-include="'/static/partials/nav.html'"></div>

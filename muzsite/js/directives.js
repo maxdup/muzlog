@@ -95,6 +95,54 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
       templateUrl: '/static/partials/admin/directives/album_display.html',
     }
   })
+  .directive('profileDisplay', function(){
+    return {
+      restrict: 'EA',
+      replace: true,
+      scope: {
+        profile: '=ngModel',
+      },
+      templateUrl: '/static/partials/admin/directives/profile_display.html',
+      controller: [
+        "$scope", "Profile", "conf", 'UploadService',
+        function($scope, Profile, conf, UploadService) {
+          $scope.conf = conf;
+          $scope.enable_edit = true;
+          $scope.open_edit = function(){
+            $scope.backup = _.cloneDeep($scope.profile);
+          }
+          $scope.select_file = function(files){
+            if (files.length > 0){
+              $scope.avatar_file = files[0];
+            }
+          }
+          $scope.save_changes = function(){
+            Profile.update($scope.profile)
+              .$promise.then(function(value){
+                $scope.profile = value.profile;
+                if ($scope.avatar_file){
+                  var url = '/api/upload_profile_avatar/'+ $scope.profile.id;
+                  UploadService.upload(url, $scope.avatar_file)
+                    .then(function(result){
+                      $scope.profile.thumb = result.data;
+                      $scope.avatar_file = null;
+                      $scope.backup = null;
+                    }, function(err){
+                      alert('there was a problem saving the avatar',);
+                      $scope.backup = null;
+                    })
+                } else {
+                  $scope.backup = null;
+                }
+              })
+          }
+          $scope.cancel_changes = function(){
+            $scope.profile = $scope.backup;
+            $scope.backup = null;
+          }
+        }]
+    }
+  })
 
   .directive('albumCreator', function() {
     return {

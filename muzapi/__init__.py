@@ -12,9 +12,10 @@ db = MongoEngine()
 
 from muzapi.models import User, Role
 from muzapi.bp_pages import *
-from muzapi.bp_cover import muzlog_upload
+from muzapi.bp_files import muzlog_upload
 from muzapi.res_album import Album_res
 from muzapi.res_log import Log_res
+from muzapi.res_user import User_res
 
 
 def create_app(config):
@@ -35,6 +36,9 @@ def create_app(config):
     api.add_resource(Album_res, "/api/album/<string:_id>", endpoint="album")
     api.add_resource(Log_res, "/api/log", endpoint="logs")
     api.add_resource(Log_res, "/api/log/<string:_id>", endpoint="log")
+    api.add_resource(User_res, "/api/profile", endpoint="profiles")
+    api.add_resource(User_res, "/api/profile/<string:_id>", endpoint="profile")
+    #api.add_resource(Role_res, "/api/roles/<string:_id>", endpoint="roles")
 
     app.register_blueprint(muzlog_pages)
     app.register_blueprint(muzlog_upload)

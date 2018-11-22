@@ -2,7 +2,7 @@
   <div class="row">
     <div class="cover col s3">
       <div>
-        <img ng-if="album.thumb" ng-src="{{conf.cover_url + album.thumb}}"/>
+        <img ng-if="album.thumb" ng-src="{{conf.img_url + album.thumb}}"/>
         <img class="external" ng-if="!album.thumb" alt=""
              ng-src="{{'http://coverartarchive.org/release/' + album.mbid + '/front-250.jpg'}}">
         <img ng-if="!album.thumb" src="/static/images/placeholder.jpg"/>

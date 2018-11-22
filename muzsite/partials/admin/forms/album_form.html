@@ -6,7 +6,7 @@
       <div>
         <img ngf-thumbnail="cover_file || '/static/images/placeholder.jpg'"
              ng-if="cover_file">
-        <img ng-src="{{conf.cover_url + album.thumb}}"
+        <img ng-src="{{conf.img_url + album.thumb}}"
              ng-if="album.thumb && !cover_file"/>
       </div>
     </div>

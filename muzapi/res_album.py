@@ -4,9 +4,10 @@ from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
 from datetime import datetime
+import re
 
 from muzapi.util import DictDiffer
-from muzapi.bp_cover import downloadBrainzCover
+from muzapi.bp_files import downloadBrainzCover
 from muzapi.models import *
 from muzapi.res_log import Log_res
 
@@ -40,19 +41,19 @@ class Album_res(Resource):
 
     def get(self, _id=None):
         '''
-        Get Ablums
+        Get Albums
 
         :param_id: The _id of an Album object
         '''
         if (_id):
-            album = Album.objects(id=_id)
-            return marshal({'album': album[0]}, self.album_render)
+            album = Album.objects.get(id=_id)
+            return marshal({'album': album}, self.album_render)
         else:
             albums = Album.objects(deleted=False)
             return marshal({'albums': albums}, self.albums_render)
 
     @login_required
-    @roles_accepted('logger')
+    @roles_accepted('logger', 'admin')
     def post(self, _id=None):
         '''
         Create an Album
@@ -100,9 +101,16 @@ class Album_res(Resource):
                 album.title = x['title']
 
             if 'date' in x:
-                date = datetime.strptime(x['date'], "%Y-%m-%d")
-                album.release_date = date
-                album.release_year = date.year
+                year_re = re.compile('^[0-9]{4}$')
+                date_re = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+
+                if year_re.match(x['date']):
+                    album.release_year = x['date']
+                elif date_re.match(x['date']):
+                    date = datetime.strptime(x['date'], "%Y-%m-%d")
+                    album.release_date = date
+                    album.release_year = date.year
+
             elif 'release_date' in x and x['release_date']:
                 date = datetime.strptime(x['release_date'], "%d/%m/%Y")
                 album.release_date = date
@@ -123,7 +131,7 @@ class Album_res(Resource):
             abort(400)
 
     @login_required
-    @roles_accepted('logger')
+    @roles_accepted('logger', 'admin')
     def put(self, _id=None):
         '''
         Update an Album
@@ -171,7 +179,7 @@ class Album_res(Resource):
         return marshal({'album': album}, self.album_render)
 
     @login_required
-    @roles_accepted('logger')
+    @roles_accepted('logger', 'admin')
     def delete(self, _id=None):
         '''
         Update an Album

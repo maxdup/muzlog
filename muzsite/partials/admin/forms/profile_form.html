@@ -1,0 +1,50 @@
+<form>
+
+
+  <div class="row">
+    <!-- Avatar Art -->
+    <div class="cover col s3">
+      <div>
+        <img ngf-thumbnail="avatar_file || '/static/images/placeholder.jpg'"
+             ng-if="avatar_file">
+        <img ng-src="{{conf.img_url + profile.thumb}}"
+             ng-if="profile.thumb && !avatar_file"/>
+      </div>
+    </div>
+    <div class="col" ng-class="{'s9': profile.thumb || avatar_file,
+                               's12': !profile.thumb && !avatar_file}">
+      <div class="file-field input-field"
+
+           ngf-select="select_file($files)">
+        <div class="btn">
+          <span>Select Avatar</span>
+        </div>
+        <div class="file-path-wrapper">
+          <input disabled class="file-path validate" type="text"
+                 ng-value="avatar_file.name">
+        </div>
+      </div>
+      <div class="row">
+        <!-- Username -->
+        <div class="input-field col s6">
+          <input id="user_username" ng-model="profile.username" type="text">
+          <label for="user_username">Username</label>
+        </div>
+
+
+        <!-- Color -->
+        <div class="input-field col s6">
+          <input id="user_color" ng-model="profile.color" type="text">
+          <label for="user_color">Color (#000000)</label>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div class="input-field">
+        <textarea id="textarea" ng-model="profile.bio"
+                  class="materialize-textarea"></textarea>
+        <label for="textarea">Bio</label>
+      </div>
+    </div>
+  </div>
+</form>

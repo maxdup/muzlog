@@ -1,11 +1,10 @@
 require('ng-file-upload');
-module.exports = angular.module('muz.adminCtrl', ['ngFileUpload'])
+module.exports = angular.module('muz.albumCtrl', ['ngFileUpload'])
 
-  .controller('AdminController', [
+  .controller('ViewAlbumsController', [
     '$scope', 'Album', function($scope, Album) {
       Album.get().$promise.then(function(value){
         $scope.albums = value.albums;
-        console.log('albums', $scope.albums);
       });
     }])
 

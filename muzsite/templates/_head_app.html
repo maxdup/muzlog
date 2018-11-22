@@ -10,6 +10,6 @@
 
   <base href="/">
 </head>
-<body style="background: #fe9ca1;" ng-app="muzApp">
+<body style="background: #fe9ca1;" ng-app="muzApp" ng-controller="RootController">
   {% include "_messages.html" %}
-  {% include "_nav.html"%}
+  <div ng-include="'/static/partials/nav.html'"></div>

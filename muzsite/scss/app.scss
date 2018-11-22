@@ -27,22 +27,27 @@ table {
     }
 
 }
-.album-display, .log-display {
+.album-display, .log-display, .profile-display {
     .btn-floating {
         float:right;
         margin-left: 10px;
+    }
+}
+.profile-display {
+    p.roles {
+        font-weight: 600;
+        margin-top: 20px;
     }
 }
 .btn-controls {
     text-align: right;
 }
 
-.cover {
-    >div {
+.avatar, .cover {
+       >div {
         position: relative
     }
     img {
-        min-height: 100%;
         width: 100%;
         height: auto;
     }
@@ -69,4 +74,9 @@ table {
         text-align: center;
         content: attr(alt);
     }
+}
+.avatar {
+}
+.cover {
+ 
 }

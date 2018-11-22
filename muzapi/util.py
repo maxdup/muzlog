@@ -1,3 +1,26 @@
+from flask_restful import fields, marshal
+from flask_security import current_user
+from muzapi import Role
+
+
+class stringRestricted(fields.String):
+    def output(self, key, obj):
+        if obj.id == current_user.id \
+           or current_user.has_role('admin'):
+            return fields.String.output(self, key, obj)
+        else:
+            return None
+
+
+class listRestricted(fields.List):
+    def output(self, key, data):
+        if data.id == current_user.id \
+           or current_user.has_role('admin'):
+            return fields.List.output(self, key, data)
+        else:
+            return []
+
+
 class DictDiffer(object):
     def __init__(self, current_dict, past_dict):
         self.current_dict, self.past_dict = current_dict, past_dict
