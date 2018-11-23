@@ -8,9 +8,11 @@
   {% if register_user_form.password_confirm %}
   {{ render_field_with_errors(register_user_form.password_confirm) }}
   {% endif %}
-  <button class="waves-effect waves-light btn"
-          type="submit" name="submit" id="submit">
-    Register
-  </button>
+  <div class="btn-controls">
+    <button class="waves-effect waves-light btn"
+            type="submit" name="submit" id="submit">
+      Register
+    </button>
+  </div>
 </form>
 {% endblock %}

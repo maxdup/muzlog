@@ -6,9 +6,11 @@
   {{ render_field_with_errors(login_user_form.email) }}
   {{ render_field_with_errors(login_user_form.password) }}
   {{ render_field_with_errors(login_user_form.remember) }}
-  <button class="waves-effect waves-light btn"
-          type="submit" name="submit" id="submit">
-    Login
-  </button>
+  <div class="btn-controls">
+    <button class="waves-effect waves-light btn"
+            type="submit" name="submit" id="submit">
+      Login
+    </button>
+  </div>
 </form>
 {% endblock %}

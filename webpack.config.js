@@ -21,8 +21,8 @@ module.exports = {
     ],
     app_admin: [
       rootAssetPath + "/scss/security.scss",
-      rootAssetPath + "/scss/app.scss",
       rootAssetPath + "/js/admin.js",
+      rootAssetPath + "/scss/app.scss",
     ],
   },
   output: {

@@ -1,0 +1,16 @@
+{% macro render_field_with_errors(field) %}
+<div class="input-field">
+  {{ field(**kwargs)|safe }} {{ field.label }}
+  {% if field.errors %}
+  {% for error in field.errors %}
+  <span class="helper-text" data-error="wrong" data-success="right">{{ error }}</span>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_field(field) %}
+<div class="input-field">
+  {{ field(**kwargs)|safe }}
+</div>
+{% endmacro %}

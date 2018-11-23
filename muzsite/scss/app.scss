@@ -1,6 +1,3 @@
-body {
-    background: bisque;
-}
 table {
     th {
         font-weight: 600;
@@ -58,17 +55,6 @@ table {
 }
 .input-field.col {
     min-height: 44px;
-}
-
-.btn-controls {
-    .btn {
-        margin-left: 0px;
-        margin-bottom: 5px;
-    }
-    text-align: right;
-}
-.btn {
-    padding: 0 1rem;
 }
 
 .role-editor {

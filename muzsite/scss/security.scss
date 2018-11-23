@@ -1,3 +1,17 @@
+body {
+    background: bisque;
+}
+.btn-controls {
+    .btn {
+        margin-left: 0px;
+        margin-bottom: 5px;
+    }
+    text-align: right;
+}
+.btn {
+    padding: 0 1rem;
+}
+
 #flashes {
     position: fixed;
     top: 60px;
