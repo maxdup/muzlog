@@ -1,20 +1,21 @@
 <form>
   <div class="row">
     <!-- Avatar Art -->
-    <div class="cover col s2">
-      <div>
-        <img ngf-thumbnail="avatar_file || '/static/images/user_placeholder.jpg'"
-             ng-if="!profile.thumb">
+    <div class="col s6 m2 thumbnail avatar">
+      <div class="border" ng-style="{background: profile.color}">
+        <div class="img-container" ngf-background="avatar_file"></div>
         <img ng-src="{{conf.img_url + profile.thumb}}"
              ng-if="profile.thumb && !avatar_file"/>
+        <img src="/static/images/user_placeholder.jpg"
+             ng-if="!profile.thumb && !avatar_file">
       </div>
     </div>
-    <div class="col s10">
+    <div class="col s12 m10">
       <div class="file-field input-field"
            ngf-select="select_file($files)">
-
-        <div class="btn">
-          <span>Select Avatar</span>
+        <div class="waves-effect waves-light btn">
+          <i class="material-icons left">image</i>
+          Select Image
         </div>
         <div class="file-path-wrapper">
           <input disabled class="file-path validate" type="text"

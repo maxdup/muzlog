@@ -19,6 +19,11 @@ class Album_res(Resource):
         'artist': fields.String,
         'title': fields.String,
         'release_year': fields.Integer,
+        'published': fields.Boolean,
+        'published_date': fields.DateTime(dt_format='iso8601'),
+        'published_by_username': fields.String(
+            attribute=lambda x: x.published_by.username
+            if x.published_by and 'username' in x.published_by else ''),
         'cover': fields.String,
         'thumb': fields.String,
     }
@@ -49,11 +54,12 @@ class Album_res(Resource):
             album = Album.objects.get(id=_id)
             return marshal({'album': album}, self.album_render)
         else:
-            albums = Album.objects(deleted=False)
+            albums = Album.objects(deleted=False).order_by(
+                'published', '-published_date')
             return marshal({'albums': albums}, self.albums_render)
 
     @login_required
-    @roles_accepted('logger', 'admin')
+    @roles_accepted('admin', 'logger')
     def post(self, _id=None):
         '''
         Create an Album
@@ -131,7 +137,7 @@ class Album_res(Resource):
             abort(400)
 
     @login_required
-    @roles_accepted('logger', 'admin')
+    @roles_accepted('admin', 'logger')
     def put(self, _id=None):
         '''
         Update an Album
@@ -164,6 +170,8 @@ class Album_res(Resource):
             del content['mbid']
         if 'asin' in content and not content['asin']:
             del content['asin']
+        if 'published_by_username':
+            del content['published_by_username']
 
         delta = DictDiffer(content, album.to_mongo()).changed()
 
@@ -179,7 +187,7 @@ class Album_res(Resource):
         return marshal({'album': album}, self.album_render)
 
     @login_required
-    @roles_accepted('logger', 'admin')
+    @roles_accepted('admin', 'logger')
     def delete(self, _id=None):
         '''
         Update an Album

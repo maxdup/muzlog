@@ -8,7 +8,7 @@
 
   <div class="row">
     <!-- Publish Date -->
-    <div class="input-field col s4">
+    <div class="input-field col s12 m4">
       <input input-date type="text" id="log_published"
              ng-model="log.published_date" format="dd/mm/yyyy"/>
       <label for="log_published">
@@ -17,14 +17,14 @@
     </div>
 
     <!-- Published -->
-    <div class="input-field col s4" ng-if="backup.published">
+    <div class="input-field col s6 m4" ng-if="backup.published">
       <input ng-model="log.published"
              type="checkbox" id="published" />
       <label for="published">Published</label>
     </div>
 
     <!-- Recommended -->
-    <div class="input-field col s4">
+    <div class="input-field col s6 m4">
       <input ng-model="log.recommended"
              type="checkbox" id="recommended" />
       <label for="recommended">Recommended</label>

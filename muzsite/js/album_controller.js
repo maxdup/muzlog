@@ -1,5 +1,4 @@
-require('ng-file-upload');
-module.exports = angular.module('muz.albumCtrl', ['ngFileUpload'])
+module.exports = angular.module('muz.albumCtrl', [])
 
   .controller('ViewAlbumsController', [
     '$scope', 'Album', function($scope, Album) {
@@ -9,8 +8,8 @@ module.exports = angular.module('muz.albumCtrl', ['ngFileUpload'])
     }])
 
   .controller('EditAlbumController', [
-    '$state', '$stateParams', '$scope', 'Album', 'Upload', '$q', 'conf',
-    function($state, $stateParams, $scope, Album, Upload, $q, conf) {
+    '$state', '$stateParams', '$scope', 'Album', 'UploadService', '$q', 'conf',
+    function($state, $stateParams, $scope, Album, UploadService, $q, conf) {
       $scope.conf = conf;
 
       Album.get({id:$stateParams.id})
@@ -22,13 +21,14 @@ module.exports = angular.module('muz.albumCtrl', ['ngFileUpload'])
         Album.update($scope.album)
           .$promise.then(function(value){
             if ($scope.cover_file){
-              upload($scope.cover_file, value.album.id)
+              var url = '/api/upload_album_cover/' + value.album.id;
+              UploadService.upload(url, $scope.cover_file)
                 .then(function(result){
                   $scope.album = result.album;
                   $state.go('create_log', {'id': value.album.id});
                 }, function(){
                   $state.go('create_log', {'id': value.album.id});
-                })
+                });
               $scope.album = value.album;
             } else {
               $scope.album = value.album;
@@ -44,7 +44,7 @@ module.exports = angular.module('muz.albumCtrl', ['ngFileUpload'])
         if (confirm("This album will be deleted")){
           Album.delete({id:$scope.album.id})
             .$promise.then(function(){
-              $state.go('admin');
+              $state.go('view_albums');
             });
         }
       }
@@ -54,16 +54,6 @@ module.exports = angular.module('muz.albumCtrl', ['ngFileUpload'])
           $scope.cover_file = files[0];
         }
       }
-
-      var upload = function(cover_file, album_id){
-        return $q(function(resolve, reject) {
-          Upload.upload({
-            url: '/upload_album_cover/' + album_id,
-            data: { file: cover_file }})
-            .then(resolve,reject);
-        });
-      };
-
     }])
 
   .controller('CreateAlbumController', [

@@ -49,7 +49,7 @@ def save_image(image_file, filename_large, filename_small, max_size):
 
 @muzlog_upload.route('/api/upload_album_cover/<_id>', methods=['POST'])
 @login_required
-@roles_accepted('logger', 'admin')
+@roles_accepted('admin', 'logger')
 def upload_cover(_id=None):
     '''
     Upload an Album cover
@@ -80,7 +80,7 @@ def upload_cover(_id=None):
 
 @muzlog_upload.route('/api/upload_profile_avatar/<_id>', methods=['POST'])
 @login_required
-@roles_accepted('logger', 'admin')
+@roles_accepted('admin', 'logger')
 def upload_avatar(_id=None):
     '''
     Upload a Profile avatar

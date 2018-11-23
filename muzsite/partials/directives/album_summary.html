@@ -1,34 +1,42 @@
 <div class="album-summary">
-  <div class="row">
-    <div class="cover col s3">
-      <div>
-        <img ng-if="album.thumb" ng-src="{{conf.img_url + album.thumb}}"/>
-        <img class="external" ng-if="!album.thumb" alt=""
-             ng-src="{{'http://coverartarchive.org/release/' + album.mbid + '/front-250.jpg'}}">
-        <img ng-if="!album.thumb" src="/static/images/placeholder.jpg"/>
+
+  <div class="row item-layout">
+
+    <div class="col s6 m3 thumbnail">
+      <div class="border">
+        <img class="external" ng-if="!album.thumb && album.mbid" alt=""
+             ng-src="{{'http://coverartarchive.org/release/' +
+                     album.mbid + '/front-250.jpg'}}">
+        <img ng-if="album.thumb"
+             ng-src="{{conf.img_url + album.thumb}}"/>
+        <img ng-if="!album.thumb && !album.mbid"
+             src="/static/images/album_placeholder.jpg"/>
       </div>
     </div>
-    <div class="col s9">
-      <h3>{{album.title}} by {{album.artist ||
+
+    <div class="col s12 m9">
+      <a ng-if="enable_edit" ui-sref="edit_album({id: album.id})"
+         class="btn-floating btn-large waves-effect waves-light red">
+        <i class="material-icons">edit</i>
+      </a>
+      <h4>
+        {{album.title}} by {{album.artist ||
         album['artist-credit'][0].artist.name || 'unknown'}}
-      </h3>
+      </h4>
+      <div class="summary">
+        <p>
+          <b>Release date:</b> <span ng-if="album.date || album.release_date">
+            {{ album.date || album.release_date | date: medium : UTC}}</span>
+          <span ng-if="!album.date && !album.release_date">
+            {{album.release_year || 'unknown'}}</span><br>
+          <b>Record Label:</b> {{ album.label ||
+          album['label-info'][0].label.name || 'unknown'}}<br>
+          <b>Country:</b> {{album.country  || 'unknown'}}<br>
+          <b>ASIN:</b> {{album.asin || 'unknown'}}<br>
+          <b>MusicBrains ID:</b> {{album.mbid || 'unknown'}}<br>
+        </p>
+      </div>
     </div>
   </div>
-  <a ng-if="enable_edit" ui-sref="edit_album({id: album.id})"
-     class="btn-floating btn-large waves-effect waves-light red">
-    <i class="material-icons">edit</i>
-  </a>
-  <div class="summary">
-    <p>
-      <b>Release date:</b> <span ng-if="album.date || album.release_date">
-        {{ album.date || album.release_date | date: medium : UTC}}</span>
-      <span ng-if="!album.date && !album.release_date">
-        {{album.release_year || 'unknown'}}</span><br>
-      <b>Record Label:</b> {{ album.label ||
-      album['label-info'][0].label.name || 'unknown'}}<br>
-      <b>Country:</b> {{album.country  || 'unknown'}}<br>
-      <b>ASIN:</b> {{album.asin || 'unknown'}}<br>
-      <b>MusicBrains ID:</b> {{album.mbid || 'unknown'}}<br>
-    </p>
-  </div>
+
 </div>

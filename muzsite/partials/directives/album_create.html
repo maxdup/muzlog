@@ -44,15 +44,12 @@
 
       <div ng-if="mb_album">
         <album-summary ng-model="mb_album"></album-summary>
-
-        <a class="waves-effect waves-light btn"
-           ng-click="unselect_search_result()">
-          Unselect Album
-        </a>
-        <a class="waves-effect waves-light btn"
-           ng-click="save_brainz_album()">
-          Save Album
-        </a>
+        <div class="btn-controls">
+          <a class="waves-effect waves-light btn" ng-click="unselect_search_result()">
+            <i class="material-icons right">close</i>Unselect Album</a>
+          <a class="waves-effect waves-light btn" ng-click="save_brainz_album()">
+            <i class="material-icons right">chevron_right</i>Save Album</a>
+        </div>
       </div>
     </div>
 
@@ -60,8 +57,8 @@
     <div id="tab-manual">
       <div ng-include="'/static/partials/admin/forms/album_form.html'"></div>
       <div class="btn-controls">
-        <input class="waves-effect waves-light btn" ng-click="save_album()"
-               type="submit" value="Submit"/>
+        <a class="waves-effect waves-light btn" ng-click="save_album()">
+          <i class="material-icons right">chevron_right</i>Save Changes</a>
       </div>
     </div>
   </div>

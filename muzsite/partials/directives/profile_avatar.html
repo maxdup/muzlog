@@ -1,5 +1,6 @@
 <a class="avatar" ui-sref="edit_profile({id: profile.id})">
   <div class="border" style="background: {{profile.color}}">
-    <img ng-src="{{$root.conf.img_url + profile.thumb}}"/>
+    <img ng-if="profile.thumb" ng-src="{{$root.conf.img_url + profile.thumb}}"/>
+    <img ng-if="!profile.thumb" src="/static/images/user_placeholder.jpg"/>
   </div>
 </a>

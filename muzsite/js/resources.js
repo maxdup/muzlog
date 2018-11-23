@@ -1,4 +1,5 @@
 require('angular-resource/angular-resource.js');
+require('ng-file-upload');
 
 module.exports = angular.module('muz.resources',['ngResource', 'ngFileUpload'])
   .factory('Album', ["$resource", function($resource) {

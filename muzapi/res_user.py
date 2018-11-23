@@ -51,7 +51,7 @@ class User_res(Resource):
             return marshal({'profiles': users}, self.users_render)
 
     @login_required
-    @roles_accepted('logger', 'admin')
+    @roles_accepted('admin', 'logger')
     def put(self, _id=None):
         '''
         Update Users

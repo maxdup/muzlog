@@ -1,6 +1,5 @@
 _ = require('lodash');
-require('ng-file-upload');
-module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
+module.exports = angular.module('muz.adminDirectives', [])
 
   .directive('logCreator', function(){
     return {
@@ -14,13 +13,13 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
       controller: ["$scope", "Log", function($scope, Log) {
         $scope.log = {};
 
-        $scope.publish_log = function(log){
-          log.published = true;
-          $scope.save_log(log);
+        $scope.publish_log = function(){
+          $scope.log.published = true;
+          $scope.save_log();
         }
-        $scope.save_log = function(log){
-          log.album_id = $scope.albumId;
-          Log.save(log).$promise.then(function(value){
+        $scope.save_log = function(){
+          $scope.log.album_id = $scope.albumId;
+          Log.save($scope.log).$promise.then(function(value){
             $scope.onCreate(value);
             $scope.log = {};
           });
@@ -165,8 +164,8 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
       },
       templateUrl: '/static/partials/directives/album_create.html',
       controller: [
-        "$state", "$scope", "$http", "Album", "Upload", "conf", "$q",
-        function($state, $scope, $http, Album, Upload, conf, $q) {
+        "$state", "$scope", "$http", "Album", "UploadService", "conf", "$q",
+        function($state, $scope, $http, Album, UploadService, conf, $q) {
           $scope.conf = conf;
           $scope.album = {};
 
@@ -195,8 +194,9 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
           }
           $scope.save_album = function(){
             Album.save($scope.album).$promise.then(function(value){
-              upload($scope.cover_file, value.album.id).then(
-                function(result){
+              var url = '/api/upload_album_cover/' + value.album.id;
+              UploadService.upload(url, $scope.cover_file)
+                .then(function(result){
                   album_saved(value);
                 }, function(err){
                   album_saved(value);
@@ -207,19 +207,12 @@ module.exports = angular.module('muz.adminDirectives', ['ngFileUpload'])
             Album.save($scope.mb_album).$promise.then(album_saved);
           }
 
-          $scope.select_file = function(files){
-            if (files.length > 0){
-              $scope.cover_file = files[0];
-            }
+        $scope.select_file = function(files){
+          if (files.length > 0){
+            $scope.cover_file = files[0];
           }
-          var upload = function(cover_file, album_id){
-            return $q(function(resolve, reject) {
-              Upload.upload({
-	            url: '/upload_album_cover/' + album_id,
-                data: { file: cover_file }})
-                .then(resolve,reject);
-            });
-          }
-        }]
+        }
+      }]
     }
+
   });

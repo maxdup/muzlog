@@ -1,38 +1,46 @@
 <div class="row card profile-display">
   <div class="card-content">
 
-    <div ng-if="!backup" class="row">
-      <div class="col s2 avatar" >
-        <img ng-if="profile.thumb" ng-src="{{conf.img_url + profile.thumb}}">
-        <img ng-if="!profile.thumb" src="/static/images/user_placeholder.jpg">
-      </div>
-      <div class="col s10">
-        <a ng-click="open_edit()"
+    <div ng-if="!backup" class="row item-layout">
+
+      <div class="col s6 m3 thumbnail avatar">
+        <div class="border" ng-style="{background: profile.color}">
+          <img ng-if="profile.thumb" ng-src="{{conf.img_url + profile.thumb}}">
+          <img ng-if="!profile.thumb" src="/static/images/user_placeholder.jpg">
+        </div>
+     </div>
+
+      <div class="col s12 m9">
+        <a class="btn-floating btn-large waves-effect waves-light red"
            ng-if="$root.profile.roles.indexOf('admin') != -1 ||
-              $root.profile.id == profile.id"
-           class="btn-floating btn-large waves-effect waves-light red">
+                  $root.profile.id == profile.id"
+           ng-click="open_edit()">
           <i class="material-icons">edit</i>
         </a>
-        <h3>{{profile.username}}</h3>
-        <p>{{profile.bio}}</p>
-        <p class="extra" ng-if="profile.email">
-          <span class="email">{{profile.email}}</span>
-          <span class="roles" ng-repeat="role in profile.roles">
-            {{role}}<font ng-show="!$last">,</font>
-          </span>
-        </p>
-
-        </p>
+        <div class="col-like">
+          <h3 ng-if="profile.username">{{profile.username}}</h3>
+          <div ng-if="profile.bio" class="row-like">
+            <p>{{profile.bio}}</p>
+          </div>
+          <div class="row-like">
+            <p class="" ng-if="profile.email">
+              <span class="email">{{profile.email}}</span>
+              <span class="roles" ng-repeat="role in profile.roles">
+                {{role}}<font ng-show="!$last">,</font>
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
     <div ng-if="backup">
       <div ng-include="'/static/partials/admin/forms/profile_form.html'"></div>
       <div class="btn-controls">
-        <input class="waves-effect waves-light btn" ng-click="cancel_changes()"
-               type="submit" value="Cancel Changes"/>
-        <input class="waves-effect waves-light btn" ng-click="save_changes()"
-               type="submit" value="Save Changes"/>
+        <a class="waves-effect waves-light btn" ng-click="cancel_changes()">
+          <i class="material-icons right">close</i>Cancel Changes</a>
+        <a class="waves-effect waves-light btn" ng-click="save_changes()">
+          <i class="material-icons right">save</i>Save Changes</a>
       </div>
     </div>
   </div>

@@ -1,35 +1,49 @@
 <div class="card log-display">
   <div class="card-content">
 
-    <h4>{{log.author.username}}'s log {{log.published? '':'(Draft)'}}</h4>
-    <div ng-if="!backup">
-      <a ng-if="enable_edit" ng-click="open_edit()"
-         class="btn-floating btn-large waves-effect waves-light red">
-        <i class="material-icons">edit</i>
-      </a>
-      <p>{{log.message}}</p>
-      <div class="row">
-        <span class="col s6">{{log.published_date | date: medium}}</span>
-        <span class="col s6">{{log.recommended ? 'Recommended': 'Not Recommended'}}</span>
+    <div class="row item-layout">
+
+      <div class="col s5 m2 thumbnail avatar">
+        <div class="border" ng-style="{background: profile.color}">
+          <img ng-if="profile.thumb"
+               ng-src="{{conf.img_url + profile.thumb}}">
+          <img ng-if="!profile.thumb"
+               src="/static/images/user_placeholder.jpg">
+        </div>
       </div>
 
-      <input class="waves-effect waves-light btn" ng-click="publish()"
-             type="submit" value="Publish log" ng-if="!log.published">
-      <input class="waves-effect waves-light btn" ng-click="delete_log()"
-             type="submit" value="Delete Draft" ng-if="!log.published"/>
+      <div class="col s12 m10">
+        <a ng-click="open_edit()" ng-hide="!enable_edit || backup"
+           class="btn-floating btn-large waves-effect waves-light red">
+          <i class="material-icons">edit</i>
+        </a>
+        <h4>{{log.author.username}}'s log {{log.published? '':'(Draft)'}}</h4>
+        <div ng-if="!backup">
+          <div class="row-like">
+            <p>{{log.message}}</p>
+          </div>
+          <div class="row">
+            <span class="col s6">{{log.published_date | date: medium}}</span>
+            <span class="col s6">{{log.recommended ? 'Recommended': 'Not Recommended'}}</span>
+          </div>
+          <div class="btn-controls" ng-if="!log.published">
+            <a class="waves-effect waves-light btn" ng-click="delete_log()">
+              <i class="material-icons right">delete</i>Delete Draft</a>
+            <a class="waves-effect waves-light btn" ng-click="publish()">
+              <i class="material-icons right">publish</i>Publish Log</a>
+          </div>
+        </div>
 
-    </div>
-
-    <div ng-if="backup">
-      <div ng-include="'/static/partials/admin/forms/log_form.html'"></div>
-      <div class="btn-controls">
-        <input class="waves-effect waves-light btn" ng-click="cancel_edit()"
-               type="submit" value="Cancel Changes"/>
-        <input class="waves-effect waves-light btn" ng-click="save_changes()"
-               type="submit" value="Save Changes"/>
-
+        <div ng-if="backup">
+          <div ng-include="'/static/partials/admin/forms/log_form.html'"></div>
+          <div class="btn-controls">
+            <a class="waves-effect waves-light btn" ng-click="cancel_edit()">
+              <i class="material-icons right">close</i>Cancel Changes</a>
+            <a class="waves-effect waves-light btn" ng-click="save_changes()">
+              <i class="material-icons right">save</i>Save Changes</a>
+          </div>
+        </div>
       </div>
     </div>
-
   </div>
 </div>

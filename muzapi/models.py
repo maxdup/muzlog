@@ -54,8 +54,7 @@ class Comment(db.EmbeddedDocument):
 
 
 class Log(db.Document):
-    author = db.ReferenceField(User, nullable=False)  # todo: add Required=True
-
+    author = db.ReferenceField(User, nullable=False, Required=True)
     album_id = db.StringField(Required=True)
     message = db.StringField(Required=True)
     published = db.BooleanField(default=False)
@@ -83,9 +82,9 @@ class Album(db.Document):
     logs = db.ListField(db.ReferenceField(Log))
 
     recommended = db.BooleanField(default=False)
-    recommended_by = db.ReferenceField(User, nullable=False)
+    recommended_by = db.ReferenceField(User, nullable=True)
     published = db.BooleanField(default=False)
-    published_by = db.ReferenceField(User, nullable=False)
+    published_by = db.ReferenceField(User, nullable=True)
     published_date = db.DateTimeField()
 
     deleted = db.BooleanField(default=False)

@@ -3,11 +3,12 @@
     <h4>New Log</h4>
     <div ng-include="'/static/partials/admin/forms/log_form.html'">
     </div>
+
     <div class="btn-controls">
-      <input class="waves-effect waves-light btn" ng-click="save_log(log)"
-             type="submit" value="Save Draft"/>
-      <input class="waves-effect waves-light btn" ng-click="publish_log(log)"
-             type="submit" value="Publish"/>
+      <a class="waves-effect waves-light btn" ng-click="save_log()">
+        <i class="material-icons right">save</i>Save Draft</a>
+      <a class="waves-effect waves-light btn" ng-click="publish_log()">
+        <i class="material-icons right">publish</i>Publish</a>
     </div>
   </div>
 </div>

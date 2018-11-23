@@ -30,7 +30,7 @@ def fake_album():
                   artist=fake.text(max_nb_chars=100),
                   release_date=release_date,
                   release_year=release_date.year,
-                  published=True)
+                  published=False)
 
     return album
 

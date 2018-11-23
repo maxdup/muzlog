@@ -2,20 +2,20 @@
 
   <!-- Cover Art -->
   <div class="row">
-    <div class="cover col s3">
-      <div>
-        <img ngf-thumbnail="cover_file || '/static/images/placeholder.jpg'"
-             ng-if="cover_file">
+    <div class="col s6 m2 thumbnail">
+      <div class="border">
+        <div class="img-container" ngf-background="cover_file"></div>
         <img ng-src="{{conf.img_url + album.thumb}}"
              ng-if="album.thumb && !cover_file"/>
+        <img src="/static/images/album_placeholder.jpg"
+             ng-if="!album.thumb && !cover_file">
       </div>
     </div>
-    <div class="file-field input-field col"
-         ng-class="{'s9': album.thumb || cover_file,
-                   's12': !album.thumb && !cover_file}"
+    <div class="file-field input-field col s12 m10"
          ngf-select="select_file($files)">
-      <div class="btn">
-        <span>File</span>
+      <div class="waves-effect waves-light btn">
+        <i class="material-icons left">image</i>
+        Select Image
       </div>
       <div class="file-path-wrapper">
         <input disabled class="file-path validate" type="text"

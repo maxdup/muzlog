@@ -51,7 +51,7 @@ class Log_res(Resource):
             abort(400)
 
     @login_required
-    @roles_accepted('logger')
+    @roles_accepted('admin', 'logger')
     def post(self, _id=None):
         '''
         Create an ablum log
@@ -62,7 +62,7 @@ class Log_res(Resource):
             x = request.get_json()
             log = Log()
 
-            #log.author = current_user.id
+            log.author = current_user.id
 
             if 'message' in x and x['message'] != '':
                 log.message = x['message']
@@ -107,7 +107,7 @@ class Log_res(Resource):
             abort(400)
 
     @login_required
-    @roles_accepted('logger')
+    @roles_accepted('admin', 'logger')
     def put(self, _id=None):
         '''
         Update an album log
@@ -130,6 +130,8 @@ class Log_res(Resource):
 
         delta = DictDiffer(content, log.to_mongo()).changed()
 
+        log.modify(**content)
+
         if 'published' in delta or \
            'recommended' in delta:
             album = Album.objects.get(id=log.album_id)
@@ -139,15 +141,16 @@ class Log_res(Resource):
         if 'published' in delta:
             still_published = False
             for l in album.logs:
-                if l.published:
+                if l.published == True:
                     still_published = True
                     album.published = True
                     album.published_by = l.author
+                    album.published_date = datetime.now()
                     break
-
             if not still_published:
                 album.published = False
                 album.published_by = None
+                album.published_date = None
             album.save()
 
         if 'recommended' in delta:
@@ -164,13 +167,12 @@ class Log_res(Resource):
                 album.recommended_by = None
             album.save()
 
-        log.modify(**content)
         log.save()
 
         return marshal({'log': log}, self.log_render)
 
     @login_required
-    @roles_accepted('logger')
+    @roles_accepted('admin', 'logger')
     def delete(self, _id=None):  # delete room
         '''
         Delete an ablum log
