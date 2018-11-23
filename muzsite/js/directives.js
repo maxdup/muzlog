@@ -145,14 +145,6 @@ module.exports = angular.module('muz.adminDirectives', [])
         }]
     }
   })
-  .directive('avatarDisplay', function(){
-    return {
-      restrict: 'EA',
-      replace: true,
-      scope: { profile: '=ngModel', },
-      templateUrl: '/static/partials/directives/profile_avatar.html',
-    }
-  })
 
   .directive('albumCreator', function() {
     return {

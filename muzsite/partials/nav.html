@@ -1,9 +1,49 @@
-  <nav>
-    <div class="nav-wrapper container highlight-color">
-      <a class="brand-logo" href="/">
-        Muzlog
-      </a>
-      <avatar-display ng-model="$root.profile" class="fill-height">
-      </avatar-display>
+<nav>
+  <div class="nav-wrapper container highlight-color">
+    <a class="brand-logo" href="/">
+      Muzlog
+    </a>
+
+    <div class="avatar">
+      <div class="border" style="background: {{profile.color}}">
+        <a data-activates="nav-mobile" data-closeonclick="true"
+           data-sidenav="right" data-menuwidth="250"></a>
+        <img ng-if="profile.thumb" ng-src="{{$root.conf.img_url + profile.thumb}}"/>
+        <img ng-if="!profile.thumb" src="/static/images/user_placeholder.jpg"/>
+      </div>
+    </a>
+
+  </div>
+</nav>
+
+<ul id="nav-mobile" class="side-nav">
+  <li>
+    <div class="col s5 m2 thumbnail avatar">
+      <div class="border" ng-style="{background: $root.profile.color}">
+        <a ui-sref="edit_profile({id:$root.profile.id})"></a>
+        <img ng-if="$root.profile.thumb"
+             ng-src="{{conf.img_url + $root.profile.thumb}}">
+        <img ng-if="!$root.profile.thumb"
+             src="/static/images/user_placeholder.jpg">
+      </div>
     </div>
-  </nav>
+  </li>
+  <li><div class="divider"></div></li>
+  <li><a class="waves-effect"
+         ui-sref="edit_profile({'id': $root.profile.id})">
+      My Profile
+  </a></li>
+  <li><a class="waves-effect" ui-sref="view_albums">
+      Albums
+  </a></li>
+  <li><a class="waves-effect" ui-sref="view_profiles">
+      Loggers
+  </a></li>
+  <li><a class="waves-effect" ui-sref="edit_roles"
+         ng-if="$root.profile.roles.indexOf('admin') != -1">
+      Roles
+  </a></li>
+  <li><a class="waves-effect" target="_self" href="/logout">
+      Logout
+  </a></li>
+</ul>
