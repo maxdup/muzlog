@@ -16,7 +16,7 @@ def fake_user():
 
 def fake_log(author, album):
     log = Log(author=author,
-              album_id=str(album.id),
+              album=album,
               message=fake.text(max_nb_chars=200),
               published_date=fake.date_this_year(before_today=True),
               recommended=(fake.random_int(min=0, max=10) == 6))

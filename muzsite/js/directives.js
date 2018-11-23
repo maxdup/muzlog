@@ -140,7 +140,7 @@ module.exports = angular.module('muz.adminDirectives', [])
             $scope.backup = null;
           }
           $scope.change_roles = function(){
-            $state.go('edit_roles',{id: $scope.profile.id})
+            $state.go('edit_roles', {uid: $scope.profile.id})
           }
         }]
     }

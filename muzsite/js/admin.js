@@ -4,12 +4,13 @@ require('angular-animate/angular-animate.js');
 
 require('./album_controller.js');
 require('./user_controller.js');
+require('./log_controller.js');
 require('./resources.js');
 require('./directives.js');
 
 module.exports = angular.module('muzApp', [
   'ui.materialize', 'ui.router', 'ngAnimate', 'muz.resources',
-  'muz.albumCtrl', 'muz.userCtrl', 'muz.adminDirectives'])
+  'muz.albumCtrl', 'muz.userCtrl', 'muz.logCtrl', 'muz.adminDirectives'])
   .config([
     "$locationProvider", "$stateProvider", "$urlRouterProvider",
     function($locationProvider, $stateProvider, $urlRouterProvider){
@@ -25,14 +26,19 @@ module.exports = angular.module('muzApp', [
           controller: 'CreateAlbumController'
         })
         .state('edit_album', {
-          url: '/cms/album/edit/:id',
+          url: '/cms/album/edit/:aid',
           templateUrl: '/static/partials/admin/edit_album.html',
           controller: 'EditAlbumController'
         })
         .state('create_log', {
-          url: '/cms/log/:id',
+          url: '/cms/log/create/:aid',
           templateUrl: '/static/partials/admin/create_log.html',
-          controller: 'LogAlbumController'
+          controller: 'CreateLogController'
+        })
+        .state('view_logs', {
+          url: '/cms/log/:uid',
+          templateUrl: '/static/partials/admin/view_logs.html',
+          controller: 'ViewLogsController'
         })
         .state('view_profiles', {
           url: '/cms/profiles',
@@ -40,7 +46,7 @@ module.exports = angular.module('muzApp', [
           controller: 'ViewProfilesController'
         })
         .state('edit_profile', {
-          url: '/cms/profile/:id',
+          url: '/cms/profile/:uid',
           templateUrl: '/static/partials/admin/edit_profile.html',
           controller: 'EditProfileController'
         })

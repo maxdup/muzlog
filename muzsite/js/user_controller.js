@@ -13,7 +13,7 @@ module.exports = angular.module('muz.userCtrl', [])
     "$stateParams", "$scope", "Profile",
     function($stateParams, $scope, Profile){
 
-      Profile.get({id:$stateParams.id})
+      Profile.get({id:$stateParams.uid})
         .$promise.then(function(value){
           $scope.profile = value.profile;
         });

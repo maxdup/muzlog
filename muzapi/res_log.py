@@ -31,11 +31,27 @@ class Log_res(Resource):
         'recommended': fields.Boolean,
         'comments': fields.List(fields.Nested(comment_fields)),
     }
+
     log_render = {
         'log': fields.Nested(log_fields)
     }
     logs_render = {
         'logs': fields.List(fields.Nested(log_fields))
+    }
+    album_summary = {
+        'id': fields.String,
+        'artist': fields.String,
+        'title': fields.String,
+        'release_year': fields.Integer,
+        'cover': fields.String,
+        'thumb': fields.String,
+    }
+    log_album_fields = {
+        'album': fields.Nested(album_summary)
+    }
+    log_album_fields.update(log_fields)
+    logs_album_render = {
+        'logs': fields.List(fields.Nested(log_album_fields))
     }
 
     def get(self, _id=None):
@@ -48,7 +64,8 @@ class Log_res(Resource):
             log = Log.objects(id=_id)
             return marshal({'log': log[0]}, self.log_render)
         else:
-            abort(400)
+            logs = Log.objects(author=current_user.id)
+            return marshal({'logs': logs}, self.logs_album_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
@@ -82,7 +99,7 @@ class Log_res(Resource):
             if 'album_id' in x and x['album_id'] != '':
                 album = Album.objects.get(id=x['album_id'])
                 if album:
-                    log.album_id = str(album.id)
+                    log.album = album
                     log.save()
                     log.reload()
                     album.logs.append(log)

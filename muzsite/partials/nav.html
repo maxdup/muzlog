@@ -20,7 +20,7 @@
   <li>
     <div class="col s5 m2 thumbnail avatar">
       <div class="border" ng-style="{background: $root.profile.color}">
-        <a ui-sref="edit_profile({id:$root.profile.id})"></a>
+        <a ui-sref="edit_profile({uid:$root.profile.id})"></a>
         <img ng-if="$root.profile.thumb"
              ng-src="{{conf.img_url + $root.profile.thumb}}">
         <img ng-if="!$root.profile.thumb"
@@ -30,8 +30,12 @@
   </li>
   <li><div class="divider"></div></li>
   <li><a class="waves-effect"
-         ui-sref="edit_profile({'id': $root.profile.id})">
+         ui-sref="edit_profile({'uid': $root.profile.id})">
       My Profile
+  </a></li>
+  <li><a class="waves-effect"
+         ui-sref="view_logs({'uid': $root.profile.id})">
+      My Logs
   </a></li>
   <li><a class="waves-effect" ui-sref="view_albums">
       Albums

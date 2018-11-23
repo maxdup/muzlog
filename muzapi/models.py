@@ -45,23 +45,14 @@ class User(db.Document, UserMixin):
         return '<User %r>' % self.id
 
 
-class Comment(db.EmbeddedDocument):
+class Message(db.Document):
     author = db.ReferenceField(User, nullable=False)
-    message = db.StringField(max_length=5000)
-    creation_time = db.DateTimeField(default=datetime.now())
-
-    user_name = db.StringField()
-
-
-class Log(db.Document):
-    author = db.ReferenceField(User, nullable=False, Required=True)
-    album_id = db.StringField(Required=True)
     message = db.StringField(Required=True)
-    published = db.BooleanField(default=False)
-    published_date = db.DateTimeField(default=datetime.now())
-    recommended = db.BooleanField(default=False)
 
-    comments = db.ListField(db.EmbeddedDocumentField(Comment, default=Comment))
+    published_date = db.DateTimeField(default=datetime.now())
+    published = db.BooleanField(default=False)
+
+    meta = {'allow_inheritance': True}
 
 
 class Album(db.Document):
@@ -79,7 +70,7 @@ class Album(db.Document):
     cover = db.StringField()
     thumb = db.StringField()
 
-    logs = db.ListField(db.ReferenceField(Log))
+    logs = db.ListField(db.ReferenceField(Message))
 
     recommended = db.BooleanField(default=False)
     recommended_by = db.ReferenceField(User, nullable=True)
@@ -88,3 +79,20 @@ class Album(db.Document):
     published_date = db.DateTimeField()
 
     deleted = db.BooleanField(default=False)
+
+
+class Comment(db.EmbeddedDocument):
+    author = db.ReferenceField(User, nullable=False)
+    message = db.StringField(Required=True)
+
+    published_date = db.DateTimeField(default=datetime.now())
+    published = db.BooleanField(default=False)
+    user_name = db.StringField()
+
+
+class Log(Message):
+    album = db.ReferenceField(Album, nullable=False)
+    recommended = db.BooleanField(default=False)
+    recommended_by = db.ReferenceField(Album, nullable=True)
+
+    comments = db.ListField(db.EmbeddedDocumentField(Comment, default=Comment))
