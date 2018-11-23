@@ -19,9 +19,9 @@
         <tbody>
           <tr ng-repeat="album in albums">
             <td>
-              <i class="material-icons right" ng-if="album.published">
+              <i class="material-icons" ng-if="album.published">
                 play_arrow</i>
-              <i class="material-icons right" ng-if="!album.published">
+              <i class="material-icons" ng-if="!album.published">
                 pause</i>
             </td>
             <td>{{album.title}} by {{album.artist}} ({{album.release_year}})</td>

@@ -18,7 +18,7 @@ module.exports = angular.module('muz.adminDirectives', [])
           $scope.save_log();
         }
         $scope.save_log = function(){
-          $scope.log.album_id = $scope.albumId;
+          $scope.log.album = $scope.albumId;
           Log.save($scope.log).$promise.then(function(value){
             $scope.onCreate(value);
             $scope.log = {};
@@ -33,12 +33,13 @@ module.exports = angular.module('muz.adminDirectives', [])
       replace: true,
       scope: {
         log: '=ngModel',
+        display: '@',
         onDelete: '&',
       },
       templateUrl: '/static/partials/directives/log_display.html',
-      controller: ["$scope", "Log", function($scope, Log) {
+      controller: ["$scope", "Log", "conf", function($scope, Log, conf) {
 
-        $scope.enable_edit = true;
+        $scope.conf = conf;
         $scope.open_edit = function(){
           $scope.backup = _.cloneDeep($scope.log);
         }

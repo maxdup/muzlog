@@ -1,3 +1,6 @@
+.card {
+    margin: 1rem 0 1rem 0;
+}
 table {
     th {
         font-weight: 600;
@@ -146,6 +149,17 @@ table {
 #nav-mobile {
     .avatar {
         padding: 50px;
+        .username {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 50px;
+            text-align: center;
+            padding-right: 20px;
+            padding-left: 20px;
+            overflow: hidden;
+        }
     }
 }
 nav {

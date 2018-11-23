@@ -50,6 +50,9 @@ class Log_res(Resource):
         'album': fields.Nested(album_summary)
     }
     log_album_fields.update(log_fields)
+    log_album_render = {
+        'log': fields.Nested(log_album_fields)
+    }
     logs_album_render = {
         'logs': fields.List(fields.Nested(log_album_fields))
     }
@@ -75,50 +78,46 @@ class Log_res(Resource):
 
         :param_id: (ignored)
         '''
+
         try:
             x = request.get_json()
-            log = Log()
 
-            log.author = current_user.id
+            if 'album' in x and x['album'] != '':
+                album = Album.objects.get(id=x['album'])
+            else:
+                abort(406)
 
-            if 'message' in x and x['message'] != '':
-                log.message = x['message']
-
-            if 'recommended' in x and x['recommended'] != '':
-                log.recommended = x['recommended']
-
-            if 'published' in x and x['published'] != '':
-                log.published = x['published']
+            log = Log(album=album,
+                      author=current_user.id,
+                      recommended=x['recommended'],
+                      published=x['published'],
+                      message=x['message'])
 
             if 'published_date' in x and x['published_date'] != '':
                 date = datetime.strptime(x['published_date'], "%d/%m/%Y")
                 log.published_date = date
+
+            if log.recommended and not log.album.recommended:
+                log.album.recommended = log.recommended
+                log.album.recommended_by = current_user.id
+
+            if log.published and not log.album.published:
+                log.album.published = True
+                log.album.published_by = current_user.id
+                log.album.published_date = log.published_date
+
             else:
                 log.published_date = datetime.now()
 
-            if 'album_id' in x and x['album_id'] != '':
-                album = Album.objects.get(id=x['album_id'])
-                if album:
-                    log.album = album
-                    log.save()
-                    log.reload()
-                    album.logs.append(log)
-                else:
-                    abort(404)
+            log.save()
+            log.reload()
+            log.album.logs.append(log)
+            log.album.save()
 
-                if not album.recommended and log.recommended:
-                    album.recommended = log.recommended
-                    album.recommended_by = log.author
+            return marshal({'log': log}, self.log_album_render)
 
-                if not album.published and log.published:
-                    album.published = True
-                    album.published_by = log.author
-                    album.published_date = log.published_date
-
-                album.save()
-
-            return marshal({'log': log}, self.log_render)
-
+        except (DoesNotExist):
+            abort(404)
         except Exception as e:
             print(e)
             abort(400)
@@ -138,10 +137,17 @@ class Log_res(Resource):
         else:
             abort(400)
 
+        if not current_user.has_role('admin'):
+            if log.author.id != current_user.id:
+                abort(403)
+
         content = request.get_json()
 
+        # ignore reference fields
         if 'author' in content:
             del content['author']
+        if 'album' in content:
+            del content['album']
         if 'comments' in content:
             del content['comments']
 
@@ -149,44 +155,39 @@ class Log_res(Resource):
 
         log.modify(**content)
 
-        if 'published' in delta or \
-           'recommended' in delta:
-            album = Album.objects.get(id=log.album_id)
-            if not album:
-                abort(400)
-
+        # mirror log changes in album
         if 'published' in delta:
             still_published = False
-            for l in album.logs:
+            for l in log.album.logs:
                 if l.published == True:
                     still_published = True
-                    album.published = True
-                    album.published_by = l.author
-                    album.published_date = datetime.now()
+                    log.album.published = True
+                    log.album.published_by = l.author
+                    log.album.published_date = datetime.now()
                     break
             if not still_published:
-                album.published = False
-                album.published_by = None
-                album.published_date = None
-            album.save()
+                log.album.published = False
+                log.album.published_by = None
+                log.album.published_date = None
+            log.album.save()
 
         if 'recommended' in delta:
             still_recommended = False
-            for l in album.logs:
+            for l in log.album.logs:
                 if l.recommended:
                     still_recommended = True
-                    album.recommended = True
-                    album.recommended_by = l.author
+                    log.album.recommended = True
+                    log.album.recommended_by = l.author
                     break
 
             if not still_recommended:
-                album.recommended = False
-                album.recommended_by = None
-            album.save()
+                log.album.recommended = False
+                log.album.recommended_by = None
+            log.album.save()
 
         log.save()
 
-        return marshal({'log': log}, self.log_render)
+        return marshal({'log': log}, self.log_album_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
@@ -198,18 +199,15 @@ class Log_res(Resource):
         '''
         if (_id):
             log = Log.objects.get(id=_id)
-            album = Album.objects.get(id=log.album_id)
-            if not log or not album:
-                abort(400)
         else:
             abort(400)
 
         if log.published:
             abort(400)
 
-        album.logs = [l for l in album.logs if l.id != log.id]
+        log.album.logs = [l for l in log.album.logs if l.id != log.id]
 
-        album.save()
+        log.album.save()
         log.delete()
 
         return (204)

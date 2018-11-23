@@ -2,22 +2,36 @@
   <div class="card-content">
 
     <div class="row item-layout">
-
-      <div class="col s5 m2 thumbnail avatar">
-        <div class="border" ng-style="{background: profile.color}">
-          <img ng-if="profile.thumb"
-               ng-src="{{conf.img_url + profile.thumb}}">
-          <img ng-if="!profile.thumb"
+      <div class="col s5 m2 thumbnail cover" ng-if="display == 'album'">
+        <div class="border">
+          <img ng-if="log.album.thumb"
+               ng-src="{{conf.img_url + log.album.thumb}}">
+          <img ng-if="!log.album.thumb"
+               src="/static/images/user_placeholder.jpg">
+        </div>
+      </div>
+      <div class="col s5 m2 thumbnail avatar" ng-if="display == 'author'">
+        <div class="border" ng-style="{background: log.author.color}">
+          <img ng-if="log.author.thumb"
+               ng-src="{{conf.img_url + log.author.thumb}}">
+          <img ng-if="!log.author.thumb"
                src="/static/images/user_placeholder.jpg">
         </div>
       </div>
 
       <div class="col s12 m10">
-        <a ng-click="open_edit()" ng-hide="!enable_edit || backup"
+        <a ng-click="open_edit()"
+           ng-hide="($root.profile.roles.indexOf('admin') == -1 &&
+                    $root.profile.id != log.author.id) || backup"
            class="btn-floating btn-large waves-effect waves-light red">
           <i class="material-icons">edit</i>
         </a>
-        <h4>{{log.author.username}}'s log {{log.published? '':'(Draft)'}}</h4>
+        <h4 ng-if="display == 'author' && log.author.username">
+          {{log.author.username}}'s log {{log.published? '':'(Draft)'}}
+        </h4>
+        <h5 ng-if="display == 'album'">
+          {{log.album.title}} by {{log.album.artist}} {{log.published? '':'(Draft)'}}
+        </h5>
         <div ng-if="!backup">
           <div class="row-like">
             <p>{{log.message}}</p>
@@ -26,7 +40,9 @@
             <span class="col s6">{{log.published_date | date: medium}}</span>
             <span class="col s6">{{log.recommended ? 'Recommended': 'Not Recommended'}}</span>
           </div>
-          <div class="btn-controls" ng-if="!log.published">
+          <div class="btn-controls"
+               ng-if=" ($root.profile.roles.indexOf('admin') != -1 ||
+                      $root.profile.id == log.author.id) && !log.published">
             <a class="waves-effect waves-light btn" ng-click="delete_log()">
               <i class="material-icons right">delete</i>Delete Draft</a>
             <a class="waves-effect waves-light btn" ng-click="publish()">
