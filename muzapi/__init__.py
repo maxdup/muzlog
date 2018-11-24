@@ -40,7 +40,6 @@ def create_app(config):
     api.add_resource(User_res, "/api/profile", endpoint="profiles")
     api.add_resource(User_res, "/api/profile/<string:_id>", endpoint="profile")
     api.add_resource(Role_res, "/api/roles", endpoint="roles")
-    api.add_resource(Role_res, "/api/roles/<string:_id>", endpoint="role")
 
     app.register_blueprint(muzlog_pages)
     app.register_blueprint(muzlog_upload)
