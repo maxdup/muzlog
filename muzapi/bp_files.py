@@ -1,7 +1,9 @@
 from flask import current_app as app, Blueprint, request
 from flask_security import current_user, roles_accepted, login_required
-from flask_restful import abort
+from flask_restful import abort, reqparse
+
 from mongoengine.queryset import DoesNotExist
+from mongoengine.errors import ValidationError
 
 from muzapi.models import Album, User
 
@@ -9,6 +11,7 @@ import os
 import uuid
 import requests
 import urllib.request
+import werkzeug
 
 from PIL import Image
 
@@ -30,21 +33,27 @@ def downloadBrainzCover(mbid):
     return {'thumb': thumb_filename, 'cover': cover_filename}
 
 
-def save_image(image_file, filename_large, filename_small, max_size):
+def save_image(image_file, resource, key, max_size):
+    file_id = str(uuid.uuid4())
+    resource[key] = file_id + '-avatar.jpg'
+    resource.thumb = file_id + '-thumb.jpg'
+
     try:
         with Image.open(image_file) as image:
             size = min(min(image.height, image.width), max_size)
             image_file = resizeimage.resize_cover(image, [size, size])
             image_file.save(os.path.join(
-                app.config['UPLOAD_FOLDER'], filename_large), image.format)
+                app.config['UPLOAD_FOLDER'], resource[key]), image.format)
+
             thumb_file = resizeimage.resize_cover(image, [250, 250])
             thumb_file.save(os.path.join(
-                app.config['UPLOAD_FOLDER'], filename_small), image.format)
+                app.config['UPLOAD_FOLDER'], resource.thumb), image.format)
+            resource.save()
     except Exception as e:
         print(e)
         return False
 
-    return True
+    return resource[key]
 
 
 @muzlog_upload.route('/api/upload_album_cover/<_id>', methods=['POST'])
@@ -56,26 +65,21 @@ def upload_cover(_id=None):
 
     :param_id: The _id of an Album object to add a cover to
     '''
+    parser = reqparse.RequestParser()
+    parser.add_argument('file', location='files', required=True,
+                        type=werkzeug.datastructures.FileStorage,
+                        help="file is required")
 
-    if 'file' not in request.files or not _id:
-        abort(406)
-
-    album = Album.objects.get(id=_id)
-    if not album:
+    try:
+        album = Album.objects.get(id=_id)
+    except (DoesNotExist, ValidationError) as e:
         abort(404)
 
-    file_id = str(uuid.uuid4())
-    cover_filename = file_id + '-cover.jpg'
-    thumb_filename = file_id + '-thumb.jpg'
+    content = parser.parse_args()
+    if not save_image(content['file'], album, 'cover', 1200):
+        abort(400)
 
-    if save_image(request.files['file'], cover_filename, thumb_filename, 1200):
-        album.cover = cover_filename
-        album.thumb = thumb_filename
-        album.save()
-    else:
-        abort(500)
-
-    return (thumb_filename, 200)
+    return (album.cover, 200)
 
 
 @muzlog_upload.route('/api/upload_profile_avatar/<_id>', methods=['POST'])
@@ -87,30 +91,25 @@ def upload_avatar(_id=None):
 
     :param_id: The _id of a Profile object to add an avatar to
     '''
-    if 'file' not in request.files or not _id:
-        abort(406)
+    parser = reqparse.RequestParser()
+    parser.add_argument('file', location='files', required=True,
+                        type=werkzeug.datastructures.FileStorage,
+                        help="file is required")
 
-    if (_id):
+    if _id:
         if _id == str(current_user.id) or \
            current_user.has_role('admin'):
-            user = User.objects.get(id=_id)
+            try:
+                user = User.objects.get(id=_id)
+            except (DoesNotExist, ValidationError) as e:
+                abort(404)
         else:
             abort(403)
     else:
         user = current_user
 
-    if not user:
-        abort(404)
+    content = parser.parse_args()
+    if not save_image(content['file'], user, 'avatar', 500):
+        abort(400)
 
-    file_id = str(uuid.uuid4())
-    avatar_filename = file_id + '-avatar.jpg'
-    thumb_filename = file_id + '-thumb.jpg'
-
-    if save_image(request.files['file'], avatar_filename, thumb_filename, 500):
-        user.profile.avatar = avatar_filename
-        user.profile.thumb = thumb_filename
-        user.save()
-    else:
-        abort(500)
-
-    return (thumb_filename, 200)
+    return (user.avatar, 200)
