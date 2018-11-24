@@ -91,7 +91,7 @@ class Comment(db.EmbeddedDocument):
 
 
 class Log(Message):
-    album = db.ReferenceField(Album, nullable=False)
+    album = db.ReferenceField(Album, nullable=False, required=True)
     recommended = db.BooleanField(default=False)
     recommended_by = db.ReferenceField(Album, nullable=True)
 

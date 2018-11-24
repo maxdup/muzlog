@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort
+from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
@@ -57,6 +57,24 @@ class Log_res(Resource):
         'logs': fields.List(fields.Nested(log_album_fields))
     }
 
+    # PUT parser
+    put_parser = reqparse.RequestParser()
+    put_parser.add_argument('id',
+                            required=True, help="album id is required")
+    put_parser.add_argument('message',
+                            required=True, help="message is required")
+    put_parser.add_argument('published_date')
+    put_parser.add_argument('published', type=bool)
+    put_parser.add_argument('recommended', type=bool)
+
+    # POST parser
+    post_parser = put_parser.copy()
+    post_parser.remove_argument('id')
+    post_parser.add_argument('album',
+                             required=True, help="album is required")
+    post_parser.replace_argument('message',
+                                 required=True, help="message is required")
+
     def get(self, _id=None):
         '''
         Get a specific log
@@ -72,42 +90,33 @@ class Log_res(Resource):
 
     @login_required
     @roles_accepted('admin', 'logger')
-    def post(self, _id=None):
-        '''
-        Create an ablum log
+    def post(self):
 
-        :param_id: (ignored)
-        '''
+        # Create an ablum log
 
+        content = self.post_parser.parse_args()
         try:
-            x = request.get_json()
-
-            if 'album' in x and x['album'] != '':
-                album = Album.objects.get(id=x['album'])
-            else:
-                abort(406)
-
+            album = Album.objects.get(id=content['album'])
             log = Log(album=album,
                       author=current_user.id,
-                      recommended=x['recommended'],
-                      published=x['published'],
-                      message=x['message'])
+                      recommended=content['recommended'],
+                      published=content['published'],
+                      message=content['message'])
 
-            if 'published_date' in x and x['published_date'] != '':
-                date = datetime.strptime(x['published_date'], "%d/%m/%Y")
+            if content['published_date']:
+                date = datetime.strptime(content['published_date'], "%d/%m/%Y")
                 log.published_date = date
-
-            if log.recommended and not log.album.recommended:
-                log.album.recommended = log.recommended
-                log.album.recommended_by = current_user.id
+            elif content['published']:
+                log.published_date = datetime.now()
 
             if log.published and not log.album.published:
                 log.album.published = True
                 log.album.published_by = current_user.id
                 log.album.published_date = log.published_date
 
-            else:
-                log.published_date = datetime.now()
+            if log.recommended and not log.album.recommended:
+                log.album.recommended = log.recommended
+                log.album.recommended_by = current_user.id
 
             log.save()
             log.reload()
@@ -130,30 +139,20 @@ class Log_res(Resource):
 
         :param_id: The _id of a Log object to update
         '''
-        if (_id):
-            log = Log.objects.get(id=_id)
-            if not log:
-                abort(404)
-        else:
-            abort(400)
+        content = self.put_parser.parse_args()
+        try:
+            log = Log.objects.get(id=content['id'])
+        except DoesNotExist:
+            abort(404)
 
         if not current_user.has_role('admin'):
             if log.author.id != current_user.id:
                 abort(403)
 
-        content = request.get_json()
-
-        # ignore reference fields
-        if 'author' in content:
-            del content['author']
-        if 'album' in content:
-            del content['album']
-        if 'comments' in content:
-            del content['comments']
-
         delta = DictDiffer(content, log.to_mongo()).changed()
 
         log.modify(**content)
+        log.save()
 
         # mirror log changes in album
         if 'published' in delta:
@@ -185,8 +184,6 @@ class Log_res(Resource):
                 log.album.recommended_by = None
             log.album.save()
 
-        log.save()
-
         return marshal({'log': log}, self.log_album_render)
 
     @login_required
@@ -197,10 +194,12 @@ class Log_res(Resource):
 
         :param_id: The _id of a Log object to delete
         '''
-        if (_id):
-            log = Log.objects.get(id=_id)
-        else:
+        if not _id:
             abort(400)
+        try:
+            log = Log.objects.get(id=_id)
+        except DoesNotExist:
+            abort(404)
 
         if log.published:
             abort(400)
