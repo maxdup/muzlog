@@ -187,13 +187,17 @@ module.exports = angular.module('muz.adminDirectives', [])
           }
           $scope.save_album = function(){
             Album.save($scope.album).$promise.then(function(value){
-              var url = '/api/upload_album_cover/' + value.album.id;
-              UploadService.upload(url, $scope.cover_file)
-                .then(function(result){
-                  album_saved(value);
-                }, function(err){
-                  album_saved(value);
-                });
+              if ($scope.cover_file){
+                var url = '/api/upload_album_cover/' + value.album.id;
+                UploadService.upload(url, $scope.cover_file)
+                  .then(function(result){
+                    album_saved(value);
+                  }, function(err){
+                    album_saved(value);
+                  });
+              } else {
+                album_saved(value);
+              }
             });
           }
           $scope.save_brainz_album = function(){

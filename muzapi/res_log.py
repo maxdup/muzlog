@@ -2,6 +2,7 @@ from flask import request, jsonify
 from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
+from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
@@ -82,7 +83,10 @@ class Log_res(Resource):
         :param_id: The _id of a Log object to get
         '''
         if (_id):
-            log = Log.objects(id=_id)
+            try:
+                log = Log.objects(id=_id)
+            except (DoesNotExist, ValidationError):
+                abort(404)
             return marshal({'log': log[0]}, self.log_render)
         else:
             logs = Log.objects(author=current_user.id)
@@ -92,44 +96,41 @@ class Log_res(Resource):
     @roles_accepted('admin', 'logger')
     def post(self):
 
-        # Create an ablum log
+        # Create an album log
 
         content = self.post_parser.parse_args()
         try:
             album = Album.objects.get(id=content['album'])
-            log = Log(album=album,
-                      author=current_user.id,
-                      recommended=content['recommended'],
-                      published=content['published'],
-                      message=content['message'])
-
-            if content['published_date']:
-                date = datetime.strptime(content['published_date'], "%d/%m/%Y")
-                log.published_date = date
-            elif content['published']:
-                log.published_date = datetime.now()
-
-            if log.published and not log.album.published:
-                log.album.published = True
-                log.album.published_by = current_user.id
-                log.album.published_date = log.published_date
-
-            if log.recommended and not log.album.recommended:
-                log.album.recommended = log.recommended
-                log.album.recommended_by = current_user.id
-
-            log.save()
-            log.reload()
-            log.album.logs.append(log)
-            log.album.save()
-
-            return marshal({'log': log}, self.log_album_render)
-
-        except (DoesNotExist):
+        except (DoesNotExist, ValidationError):
             abort(404)
-        except Exception as e:
-            print(e)
-            abort(400)
+
+        log = Log(album=album,
+                  author=current_user.id,
+                  recommended=content['recommended'],
+                  published=content['published'],
+                  message=content['message'])
+
+        if content['published_date']:
+            date = datetime.strptime(content['published_date'], "%d/%m/%Y")
+            log.published_date = date
+        elif content['published']:
+            log.published_date = datetime.now()
+
+        if log.published and not log.album.published:
+            log.album.published = True
+            log.album.published_by = current_user.id
+            log.album.published_date = log.published_date
+
+        if log.recommended and not log.album.recommended:
+            log.album.recommended = log.recommended
+            log.album.recommended_by = current_user.id
+
+        log.save()
+        log.reload()
+        log.album.logs.append(log)
+        log.album.save()
+
+        return marshal({'log': log}, self.log_album_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
@@ -142,7 +143,7 @@ class Log_res(Resource):
         content = self.put_parser.parse_args()
         try:
             log = Log.objects.get(id=content['id'])
-        except DoesNotExist:
+        except (DoesNotExist, ValidationError):
             abort(404)
 
         if not current_user.has_role('admin'):
@@ -194,11 +195,9 @@ class Log_res(Resource):
 
         :param_id: The _id of a Log object to delete
         '''
-        if not _id:
-            abort(400)
         try:
             log = Log.objects.get(id=_id)
-        except DoesNotExist:
+        except (DoesNotExist, ValidationError):
             abort(404)
 
         if log.published:

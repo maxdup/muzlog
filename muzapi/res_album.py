@@ -1,7 +1,8 @@
 from flask import current_app as app, request
-from flask_restful import Resource, fields, marshal, marshal_with, abort
+from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
+from mongoengine.errors import ValidationError
 
 from datetime import datetime
 import re
@@ -32,6 +33,7 @@ class Album_res(Resource):
         'mbid': fields.String,
         'asin': fields.String,
         'label': fields.String,
+        'country': fields.String,
         'release_date': fields.DateTime(dt_format='iso8601'),
         'logs': fields.List(fields.Nested(Log_res.log_fields)),
     }
@@ -44,6 +46,29 @@ class Album_res(Resource):
         'albums': fields.List(fields.Nested(album_fields_base))
     }
 
+    # POST parser
+    post_parser = reqparse.RequestParser()
+    post_parser.add_argument('mbid')
+    post_parser.add_argument('asin')
+    post_parser.add_argument('title')
+    post_parser.add_argument('artist')
+    post_parser.add_argument('country')
+    post_parser.add_argument('label')
+    post_parser.add_argument('release_date')
+    post_parser.add_argument('release_year')
+
+    post_parser.add_argument('date')
+    post_parser.add_argument('label-info', default=[])
+    post_parser.add_argument('artist-credit', default=[])
+
+    # PUT parser
+    put_parser = post_parser.copy()
+    put_parser.remove_argument('date')
+    put_parser.remove_argument('label-info')
+    put_parser.remove_argument('artist-credit')
+    put_parser.add_argument('id', required=True,
+                            help="album id is required")
+
     def get(self, _id=None):
         '''
         Get Albums
@@ -51,7 +76,10 @@ class Album_res(Resource):
         :param_id: The _id of an Album object
         '''
         if (_id):
-            album = Album.objects.get(id=_id)
+            try:
+                album = Album.objects.get(id=_id)
+            except (DoesNotExist, ValidationError):
+                abort(404)
             return marshal({'album': album}, self.album_render)
         else:
             albums = Album.objects(deleted=False).order_by(
@@ -66,119 +94,84 @@ class Album_res(Resource):
 
         :param_id: (ignored)
         '''
-        try:
-            x = request.get_json()
-            album = Album()
 
-            if 'mbid' in x and x['mbid']:
-                mbid_album = Album.objects(mbid=x['mbid'])
-                if mbid_album:
-                    return marshal({'album', mbid_album[0]}, self.album_render)
-                else:
-                    album.mbid = x['mbid']
+        content = self.post_parser.parse_args()
 
-            if 'asin' in x and x['asin']:
-                asin_album = Album.objects(asin=x['asin'])
-                if asin_album:
-                    return marshal({'album': asin_album[0]}, self.album_render)
-                else:
-                    album.asin = x['asin']
+        album = Album(artist=content['artist'],
+                      title=content['title'],
+                      label=content['label'],
+                      country=content['country'],
+                      release_date=content['release_date'])
 
-            if 'artist' in x and x['artist']:
-                album.artist = x['artist']
-            elif 'artist-credit' in x:
-                album.artist = 'Unknown'
-                if len(x['artist-credit']) > 0:
-                    if 'artist' in x['artist-credit'][0] and \
-                       'name' in x['artist-credit'][0]['artist']:
-                        album.artist = x['artist-credit'][0]['artist']['name']
+        if content['asin']:
+            try:
+                asin_album = Album.objects.get(asin=content['asin'])
+                return marshal({'album', asin_album}, self.album_render)
+            except (DoesNotExist, ValidationError):
+                album.asin = content['asin']
 
-            if 'label' in x and x['label']:
-                album.label = x['label']
-            elif 'label-info' in x and len(x['label-info']) > 0:
-                if 'label' in x['label-info'][0] and \
-                   'name' in x['label-info'][0]['label']:
-                    album.label = x['label-info'][0]['label']['name']
-
-            if 'country' in x and x['country']:
-                album.country = x['country']
-
-            if 'title' in x and x['title']:
-                album.title = x['title']
-
-            if 'date' in x:
-                year_re = re.compile('^[0-9]{4}$')
-                date_re = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
-
-                if year_re.match(x['date']):
-                    album.release_year = x['date']
-                elif date_re.match(x['date']):
-                    date = datetime.strptime(x['date'], "%Y-%m-%d")
-                    album.release_date = date
-                    album.release_year = date.year
-
-            elif 'release_date' in x and x['release_date']:
-                date = datetime.strptime(x['release_date'], "%d/%m/%Y")
-                album.release_date = date
-                album.release_year = date.year
-            elif 'release_year' in x and x['release_year']:
-                album.release_year = x['release_year']
-
-            if album.mbid:
+        if content['mbid']:
+            try:
+                mbid_album = Album.objects.get(mbid=content['mbid'])
+                return marshal({'album', mbid_album}, self.album_render)
+            except (DoesNotExist, ValidationError):
+                album.mbid = content['mbid']
                 covers = downloadBrainzCover(album.mbid)
                 album.cover = covers['cover']
                 album.thumb = covers['thumb']
 
-            album.save()
-            return marshal({'album': album}, self.album_render)
+        if content['date']:
+            year_re = re.compile('^[0-9]{4}$')
+            date_re = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
 
-        except Exception as e:
-            print(e)
-            abort(400)
+            if year_re.match(content['date']):
+                album.release_year = content['date']
+            elif date_re.match(content['date']):
+                date = datetime.strptime(content['date'], "%Y-%m-%d")
+                album.release_date = date
+
+        if album.release_date:
+            album.release_year = album.release_date.year
+        elif content['release_year'] and \
+                year_re.match(content['release_year']):
+            album.release_year = content['release_year']
+
+        if content['artist-credit']:
+            if 'artist' in content['artist-credit'][0] and \
+               'name' in content['artist-credit'][0]['artist']:
+                album.artist = content['artist-credit'][0]['artist']['name']
+
+        if content['label-info']:
+            if 'label' in content['label-info'][0] and \
+               'name' in content['label-info'][0]['label']:
+                album.label = content['label-info'][0]['label']['name']
+
+        album.save()
+        return marshal({'album': album}, self.album_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
     def put(self, _id=None):
-        '''
-        Update an Album
 
-        :param_id: The _id of an Album object to update
-        '''
-        if (_id):
-            album = Album.objects.get(id=_id)
-            if not album:
-                abort(404)
-        else:
-            abort(400)
+        # Update an Album
 
-        content = request.get_json()
+        content = self.put_parser.parse_args()
 
-        # Don't interfere with reference fields
-        if 'logs' in content:
-            del content['logs']
-        if 'recommended' in content:
-            del content['recommended']
-        if 'recommended_by' in content:
-            del content['recommended_by']
-        if 'published' in content:
-            del content['published']
-        if 'published_by' in content:
-            del content['published_by']
-        if 'published_date' in content:
-            del content['published_date']
-        if 'mbid' in content and not content['mbid']:
+        try:
+            album = Album.objects.get(id=content['id'])
+        except DoesNotExist:
+            abort(404)
+
+        # don't interfere with 'sparse' fields
+        if not content['mbid']:
             del content['mbid']
-        if 'asin' in content and not content['asin']:
+        if not content['asin']:
             del content['asin']
-        if 'published_by_username':
-            del content['published_by_username']
 
         delta = DictDiffer(content, album.to_mongo()).changed()
 
-        # Automatically save every other fields
         album.modify(**content)
 
-        # Manually update release year if needed
         if 'release_date' in delta and content['release_date']:
             album.release_year = album.release_date.year
 
@@ -190,16 +183,14 @@ class Album_res(Resource):
     @roles_accepted('admin', 'logger')
     def delete(self, _id=None):
         '''
-        Update an Album
+        Delete an Album
 
-        :param_id: The _id of an Album object to update
+        :param_id: The id of an Album object to delete
         '''
-        if (_id):
+        try:
             album = Album.objects.get(id=_id)
-            if not album:
-                abort(404)
-        else:
-            abort(400)
+        except (DoesNotExist, ValidationError):
+            abort(404)
 
         album.deleted = True
         album.save()

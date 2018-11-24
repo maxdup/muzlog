@@ -24,8 +24,7 @@ class UserProfile(db.EmbeddedDocument):
 
 
 class User(db.Document, UserMixin):
-    email = db.EmailField(max_length=255, nullable=False,
-                          unique=True, sparse=True)
+    email = db.EmailField(max_length=255, nullable=False, unique=True)
     password = db.StringField(max_length=255, nullable=False)
 
     profile = db.EmbeddedDocumentField(UserProfile, default=UserProfile)
