@@ -15,19 +15,16 @@ class Role(db.Document, RoleMixin):
         return '<Role %r>' % self.name
 
 
-class UserProfile(db.EmbeddedDocument):
-    username = db.StringField(max_length=75, nullable=False)
-    bio = db.StringField(max_length=400, nullable=True)
-    color = db.StringField(min_length=7, max_length=7, nullable=True)
-    avatar = db.StringField(default="")
-    thumb = db.StringField(default="")
-
-
 class User(db.Document, UserMixin):
     email = db.EmailField(max_length=255, nullable=False, unique=True)
     password = db.StringField(max_length=255, nullable=False)
 
-    profile = db.EmbeddedDocumentField(UserProfile, default=UserProfile)
+    username = db.StringField(max_length=75, nullable=False)
+    bio = db.StringField(max_length=400, nullable=True)
+    color = db.StringField(min_length=7, max_length=7, nullable=True)
+
+    avatar = db.StringField(default="")
+    thumb = db.StringField(default="")
 
     # handled by flask-security
     active = db.BooleanField(default=True)

@@ -1,7 +1,7 @@
 from flask_security.utils import hash_password
 
 from muzapi import create_app, db
-from muzapi.models import Role, User, UserProfile
+from muzapi.models import Role, User
 from muzapi.util_fakedata import fake_user, fake_album, fake_log, fake_comment
 
 
@@ -37,11 +37,9 @@ def populate_init():
         else:
             role_logger = Role.objects.get(name="admin")
 
-        profile = UserProfile(username='Admin')
-
         user = User(email='admin@muzlog.com',
+                    username='Admin',
                     password=hash_password('changeme'),
-                    profile=profile,
                     roles=[role_admin])
         user.save()
 

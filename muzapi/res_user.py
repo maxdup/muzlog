@@ -1,8 +1,8 @@
 from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort
+from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
-from mongoengine.errors import ValidationError, FieldDoesNotExist
+from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
@@ -14,13 +14,15 @@ class User_res(Resource):
 
     user_fields = {
         'id': fields.String,
-        'bio': fields.String(attribute=lambda x: x.profile.bio),
-        'username': fields.String(attribute=lambda x: x.profile.username),
-        'color': fields.String(attribute=lambda x: x.profile.color),
-        'avatar': fields.String(attribute=lambda x: x.profile.avatar),
-        'thumb': fields.String(attribute=lambda x: x.profile.thumb),
+        'email': stringRestricted,
 
-        'email': stringRestricted(),
+        'bio': fields.String,
+        'username': fields.String,
+        'color': fields.String,
+
+        'avatar': fields.String,
+        'thumb': fields.String,
+
         'roles': listRestricted(fields.String()),
     }
     user_render = {
@@ -36,55 +38,49 @@ class User_res(Resource):
 
         :param_id: The _id of an User object
         '''
-        if (_id):
-            if _id == 'me':
-                return marshal({'profile': current_user}, self.user_render)
-            else:
+        if _id == 'me':
+            return marshal({'profile': current_user}, self.user_render)
+        elif _id:
+            try:
                 user = User.objects.get(id=_id)
-                return marshal({'profile': user}, self.user_render)
+            except (DoesNotExist, ValidationError):
+                abort(404)
+            return marshal({'profile': user}, self.user_render)
+        elif current_user.has_role('admin'):
+            users = User.objects()
         else:
-            if current_user.has_role('admin'):
-                users = User.objects()
-            else:
-                log_role = Role.objects.get(name="logger")
-                users = User.objects.filter(roles__contains=log_role)
-            return marshal({'profiles': users}, self.users_render)
+            log_role = Role.objects.get(name="logger")
+            users = User.objects.filter(roles__contains=log_role)
+
+        return marshal({'profiles': users}, self.users_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
     def put(self, _id=None):
-        '''
-        Update Users
 
-        :param_id: The _id of an User object
-        '''
-        if (_id):
-            if _id == str(current_user.id) or \
+        # Update User
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('id')
+        parser.add_argument('bio')
+        parser.add_argument('color')
+        parser.add_argument('username')
+
+        content = parser.parse_args()
+
+        if content['id']:
+            if content['id'] == str(current_user.id) or \
                current_user.has_role('admin'):
-                user = User.objects.get(id=_id)
+                try:
+                    user = User.objects.get(id=content['id'])
+                except (DoesNotExist, ValidationError):
+                    abort(404)
             else:
                 abort(403)
         else:
             user = current_user
 
-        content = request.get_json()
-
-        if not user:
-            abort(404)
-
-        if not content:
-            abort(400)
-
-        del content['id']
-        del content['roles']
-
-        try:
-            for key, value in content.items():
-                setattr(user.profile, key, value)
-            user.save()
-        except (ValidationError, FieldDoesNotExist) as e:
-            abort(406)
-        except Exception as e:
-            abort(e)
+        user.modify(**content)
+        user.save()
 
         return marshal({'profile': user}, self.user_render)

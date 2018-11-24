@@ -24,6 +24,5 @@ module.exports = angular.module('muz.logCtrl', [])
 
       Log.get().$promise.then(function(value){
         $scope.logs = value.logs;
-        console.log('logs', $scope.logs);
       });
     }]);

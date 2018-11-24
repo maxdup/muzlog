@@ -6,11 +6,10 @@ fake = Faker()
 
 
 def fake_user():
-    profile = UserProfile(username=fake.name(),
-                          bio=fake.text(max_nb_chars=200))
     user = User(email=fake.email(),
-                password=hash_password(fake.password(length=10)),
-                profile=profile)
+                username=fake.name(),
+                bio=fake.text(max_nb_chars=200),
+                password=hash_password(fake.password(length=10)))
     return user
 
 

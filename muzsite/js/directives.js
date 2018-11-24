@@ -138,6 +138,7 @@ module.exports = angular.module('muz.adminDirectives', [])
           }
           $scope.cancel_changes = function(){
             $scope.profile = $scope.backup;
+            $scope.avatar_file = null;
             $scope.backup = null;
           }
           $scope.change_roles = function(){
