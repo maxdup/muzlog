@@ -7,7 +7,7 @@ import json
 from muzapi import User, Role
 from muzapi import create_app
 
-from muzapi.fake_data import fake_user, fake_album, fake_log, fake_comment
+from muzapi.util_fakedata import fake_user, fake_album, fake_log, fake_comment
 
 from datetime import datetime
 
@@ -23,14 +23,14 @@ class AlbumsTestCase(unittest.TestCase):
             self.user1 = fake_user()
             self.user1.save()
 
-            self.album = fake_album(self.user1)
+            self.album = fake_album()
             self.album.save()
 
     def tearDown(self):
         return
 
     def test_get_albums(self):
-        r = self.client().get('api/albums',
+        r = self.client().get('api/album',
                               headers={'content-type': 'application/json'})
         data = json.loads(r.data.decode())
         self.assertEqual(len(data['albums']), 1)
