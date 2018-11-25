@@ -1,6 +1,12 @@
 body {
     background: bisque;
 }
+.brand-logo {
+    img {
+        height: 100%;
+        width: auto;
+    }
+}
 .btn-controls {
     .btn {
         margin-left: 0px;

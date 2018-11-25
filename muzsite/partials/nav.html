@@ -1,7 +1,7 @@
 <nav>
   <div class="nav-wrapper container highlight-color">
     <a class="brand-logo" href="/">
-      Muzlog
+      <img src="/static/images/logo-white.png">
     </a>
 
     <div class="avatar">
@@ -9,7 +9,7 @@
         <a data-activates="nav-mobile" data-closeonclick="true"
            data-sidenav="right" data-menuwidth="250"></a>
         <img ng-if="profile.thumb" ng-src="{{$root.conf.img_url + profile.thumb}}"/>
-        <img ng-if="!profile.thumb" src="/static/images/user_placeholder.jpg"/>
+        <img ng-if="!profile.thumb" src="/static/images/placeholder_logger.jpg"/>
       </div>
     </a>
 
@@ -25,7 +25,7 @@
         <img ng-if="$root.profile.thumb"
              ng-src="{{conf.img_url + $root.profile.thumb}}">
         <img ng-if="!$root.profile.thumb"
-             src="/static/images/user_placeholder.jpg">
+             src="/static/images/placeholder_logger.jpg">
       </div>
     </div>
   </li>
