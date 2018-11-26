@@ -2,6 +2,8 @@ from flask import current_app as app
 from flask_restful import fields, marshal
 from flask_security import current_user
 from muzapi import Role
+from mongoengine.queryset import DoesNotExist
+from mongoengine.errors import ValidationError
 
 from datetime import datetime
 from datetime import timezone
@@ -48,6 +50,7 @@ def downloadBrainzCover(mbrid):
                 as out_file:
             shutil.copyfileobj(response, out_file)
     except Exception as e:
+        print('failed')
         print(e)
         return False
 
@@ -55,6 +58,14 @@ def downloadBrainzCover(mbrid):
 
 
 def album_from_mb_release_group(mbrgid, verbose=False):
+
+    # get an album object from a musicbrainz id
+    try:
+        album = Album.objects.get(mbrgid=mbrgid)
+        return album
+    except (DoesNotExist, ValidationError):
+        album = Album()
+        album.mbrgid = mbrgid
 
     musicbrainzngs.set_useragent(
         "Muzlogger",
@@ -64,13 +75,6 @@ def album_from_mb_release_group(mbrgid, verbose=False):
     rg = musicbrainzngs.get_release_group_by_id(
         id=mbrgid, includes=['artists', 'artist-credits',
                              'releases', 'media'])['release-group']
-
-    # get an album object from a musicbrainz id
-    try:
-        album = Album.objects.get(mbrgid=rg['id'])
-    except:
-        album = Album()
-        album.mbrgid = rg['id']
 
     # set artist name, artist id, album title and release type
     album.artist = rg['artist-credit-phrase']

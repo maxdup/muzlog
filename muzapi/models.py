@@ -66,26 +66,23 @@ class Album(db.Document):
 
     products = db.ListField(db.EmbeddedDocumentField(Product))
 
-    title = db.StringField(required=True)
-    artist = db.StringField(required=True)
+    title = db.StringField(required=True, nullable=False)
+    artist = db.StringField(required=True, nullable=False)
 
     label = db.StringField()
+    release_date = db.DateTimeField()
     release_type = db.StringField()  # have that be a choice?
     country_code = db.StringField()
     country = db.StringField()
 
-    release_date = db.DateTimeField()
-
     cover = db.StringField()
     thumb = db.StringField()
 
-    logs = db.ListField(db.ReferenceField(Message))
-
-    recommended = db.BooleanField(default=False)
     recommended_by = db.ReferenceField(User, nullable=True)
-    published = db.BooleanField(default=False)
-    published_by = db.ReferenceField(User, nullable=True)
-    published_date = db.DateTimeField()
+    published_by = db.ReferenceField(Message)
+    published_date = db.DateTimeField
+
+    logs = db.ListField(db.ReferenceField(Message))
 
     deleted = db.BooleanField(default=False)
 

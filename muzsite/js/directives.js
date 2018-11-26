@@ -207,8 +207,8 @@ module.exports = angular.module('muz.adminDirectives', [])
             });
           }
           $scope.save_brainz_album = function(){
-            Album.save({'mbid': $scope.mb_album.id})
-                       .$promise.then(album_saved);
+            Album.save({'mbrgid': $scope.mb_album.id})
+              .$promise.then(album_saved);
           }
 
           $scope.select_file = function(files){

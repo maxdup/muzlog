@@ -2,6 +2,7 @@ from flask_restful import fields, marshal
 from flask_restplus import reqparse
 from flask_security import current_user
 from muzapi import Role
+import datetime
 
 
 class stringRestricted(fields.String):
@@ -11,6 +12,13 @@ class stringRestricted(fields.String):
             return fields.String.output(self, key, obj)
         else:
             return None
+
+
+class fieldsDateOnly(fields.String):
+    def output(self, key, obj):
+        if (isinstance(obj[key], datetime.datetime)):
+            return obj[key].strftime('%d/%m/%Y')
+        return fields.String.output(self, key, obj)
 
 
 class listRestricted(fields.List):

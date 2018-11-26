@@ -27,8 +27,7 @@ def fake_album():
     release_date = fake.date_this_century(before_today=True)
     album = Album(title=fake.text(max_nb_chars=100),
                   artist=fake.text(max_nb_chars=100),
-                  release_date=release_date,
-                  published=False)
+                  release_date=release_date)
 
     return album
 

@@ -64,6 +64,6 @@ def populate_fake():
             album.save()
 
 
-# reset_db()
+reset_db()
 populate_init()
 # populate_fake()
