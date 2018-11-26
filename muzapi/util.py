@@ -5,7 +5,7 @@ from muzapi import Role
 
 class stringRestricted(fields.String):
     def output(self, key, obj):
-        if obj.id == current_user.id \
+        if (obj and 'id' in obj and obj.id == current_user.id) \
            or current_user.has_role('admin'):
             return fields.String.output(self, key, obj)
         else:
@@ -14,7 +14,7 @@ class stringRestricted(fields.String):
 
 class listRestricted(fields.List):
     def output(self, key, data):
-        if data.id == current_user.id \
+        if (data and 'id' in data and data.id == current_user.id) \
            or current_user.has_role('admin'):
             return fields.List.output(self, key, data)
         else:

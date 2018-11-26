@@ -13,9 +13,6 @@ def reset_db():
         db.connection.drop_database(app.config['MONGODB_DB'])
 
 
-reset_db()
-
-
 def populate_init():
 
     from muzapi import create_app
@@ -37,14 +34,12 @@ def populate_init():
         else:
             role_logger = Role.objects.get(name="admin")
 
-        user = User(email='admin@muzlog.com',
-                    username='Admin',
-                    password=hash_password('changeme'),
-                    roles=[role_admin])
-        user.save()
-
-
-populate_init()
+        if not User.objects(email='admin@muzlog.com'):
+            user = User(email='admin@muzlog.com',
+                        username='Admin',
+                        password=hash_password('changeme'),
+                        roles=[role_admin])
+            user.save()
 
 
 def populate_fake():
@@ -69,4 +64,6 @@ def populate_fake():
             album.save()
 
 
-populate_fake()
+# reset_db()
+populate_init()
+# populate_fake()
