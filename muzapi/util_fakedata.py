@@ -9,7 +9,7 @@ def fake_user():
     user = User(email=fake.email(),
                 username=fake.name(),
                 bio=fake.text(max_nb_chars=200),
-                password=hash_password(fake.password(length=10)))
+                password=hash_password('patate'))
     return user
 
 
@@ -28,7 +28,6 @@ def fake_album():
     album = Album(title=fake.text(max_nb_chars=100),
                   artist=fake.text(max_nb_chars=100),
                   release_date=release_date,
-                  release_year=release_date.year,
                   published=False)
 
     return album

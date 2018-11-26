@@ -18,7 +18,7 @@ class AlbumsTestCase(unittest.TestCase):
         app = create_app('config_test')
         with app.app_context():
             db.connection.drop_database(app.config['MONGODB_DB'])
-            self.client = app.test_client
+            self.client = app.test_client()
 
             self.user1 = fake_user()
             self.user1.save()

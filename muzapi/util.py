@@ -42,3 +42,15 @@ class DictDiffer(object):
     def unchanged(self):
         return set(o for o in self.intersect
                    if self.past_dict[o] == self.current_dict[o])
+
+
+def ensure_roles():
+    if not Role.objects(name="admin"):
+        role_admin = Role(name="admin",
+                          description="includes all permissions")
+        role_admin.save()
+
+    if not Role.objects(name="logger"):
+        role_logger = Role(name="logger",
+                           description="common poster")
+        role_logger.save()
