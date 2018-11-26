@@ -4,6 +4,7 @@ __pycache__/
 *#
 *.pyc
 .#*
+.coverage
 
 config.py
 config_test.py

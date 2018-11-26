@@ -5,3 +5,4 @@ flask-security
 flask-mongoengine
 faker
 python-resize-image
+coverage
