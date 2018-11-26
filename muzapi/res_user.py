@@ -1,12 +1,12 @@
 from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
+from flask_restful import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util import stringRestricted, listRestricted
+from muzapi.util import stringRestricted, listRestricted, parse_request
 from muzapi.models import *
 
 
@@ -60,17 +60,13 @@ class User_res(Resource):
 
         # Update User
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('id')
-        parser.add_argument('bio')
-        parser.add_argument('color')
-        parser.add_argument('username')
+        args = {'id': {}, 'bio': {}, 'color': {}, 'username': {}}
+        content = parse_request(request, args)
 
-        content = parser.parse_args()
-
-        if content['id']:
-            if content['id'] == str(current_user.id) or \
-               current_user.has_role('admin'):
+        if 'id' in content:
+            if content['id'] == str(current_user.id):
+                user = current_user
+            elif current_user.has_role('admin'):
                 try:
                     user = User.objects.get(id=content['id'])
                 except (DoesNotExist, ValidationError):
