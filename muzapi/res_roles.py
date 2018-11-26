@@ -1,8 +1,9 @@
 from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
+from flask_restful import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
+from muzapi.util import parse_request
 from muzapi.models import User, Role
 from muzapi.res_user import User_res
 
@@ -13,9 +14,8 @@ class Role_res(Resource):
         'roles': fields.List(fields.String()),
     }
 
-    parser = reqparse.RequestParser()
-    parser.add_argument('id', required=True, help="role id is required")
-    parser.add_argument('role', required=True, help="role is required")
+    args = {'id': {'required': True, 'help': "user id is required"},
+            'role': {'required': True, 'help': "role is required"}}
 
     @login_required
     @roles_accepted('admin')
@@ -30,8 +30,8 @@ class Role_res(Resource):
     def post(self):
 
         # Add a role
+        content = parse_request(request, self.args)
 
-        content = self.parser.parse_args()
         try:
             user = User.objects.get(id=content['id'])
             role = Role.objects.get(name=content['role'])
@@ -50,7 +50,8 @@ class Role_res(Resource):
 
         # Revoke a role
 
-        content = self.parser.parse_args()
+        content = parse_request(request, self.args)
+
         try:
             user = User.objects.get(id=content['id'])
             role = Role.objects.get(name=content['role'])

@@ -5,7 +5,7 @@ __pycache__/
 *.pyc
 .#*
 .coverage
-
+htmlcov
 config.py
 config_test.py
 

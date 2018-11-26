@@ -1,2 +1,3 @@
 [run]
-source = .
+source = muzapi/
+omit = muzapi/tests/*

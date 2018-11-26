@@ -4,7 +4,7 @@ import unittest
 import requests
 import json
 
-from muzapi import User, Role
+from muzapi.models import User, Role
 from muzapi.util import ensure_roles
 from muzapi import create_app
 
@@ -17,10 +17,9 @@ class RolesTestCase(unittest.TestCase):
 
     def setUp(self):
         app = create_app('config_test')
-        app.login_manager.init_app(app)
+
         with app.app_context():
             db.connection.drop_database(app.config['MONGODB_DB'])
-            app.login_manager.init_app(app)
             ensure_roles()
 
             self.client = app.test_client()
@@ -52,19 +51,19 @@ class RolesTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger.id)
             sess['_fresh'] = True
-        r = self.client.get('api/roles')
+        r = self.client.get('api/role')
         self.assertEqual(r.status_code, 302)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_1.id)
             sess['_fresh'] = True
-        r = self.client.get('api/roles')
+        r = self.client.get('api/role')
         self.assertEqual(r.status_code, 302)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_admin.id)
             sess['_fresh'] = True
-        r = self.client.get('api/roles')
+        r = self.client.get('api/role')
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())
         self.assertTrue(len(data['roles']) == 2)
@@ -73,13 +72,13 @@ class RolesTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger.id)
             sess['_fresh'] = True
-        r = self.client.post('api/roles')
+        r = self.client.post('api/role')
         self.assertEqual(r.status_code, 302)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_1.id)
             sess['_fresh'] = True
-        r = self.client.post('api/roles')
+        r = self.client.post('api/role')
         self.assertEqual(r.status_code, 302)
 
         with self.client.session_transaction() as sess:
@@ -87,17 +86,20 @@ class RolesTestCase(unittest.TestCase):
             sess['_fresh'] = True
 
         # test 404 error
-        r = self.client.post('api/roles', data={'id': str(self.u_1.id),
-                                                'role': 'patate'})
+        r = self.client.post('api/role', content_type='application/json',
+                             data=json.dumps({'id': str(self.u_1.id),
+                                              'role': 'patate'}))
         self.assertEqual(r.status_code, 404)
 
-        r = self.client.post('api/roles', data={'id': '000000000000000000000000',
-                                                'role': 'logger'})
+        r = self.client.post('api/role', content_type='application/json',
+                             data=json.dumps({'id': '000000000000000000000000',
+                                              'role': 'logger'}))
         self.assertEqual(r.status_code, 404)
 
         # give logger perm
-        r = self.client.post('api/roles', data={'id': str(self.u_1.id),
-                                                'role': 'logger'})
+        r = self.client.post('api/role', content_type='application/json',
+                             data=json.dumps({'id': str(self.u_1.id),
+                                              'role': 'logger'}))
         self.assertEqual(r.status_code, 200)
 
         # test response
@@ -112,8 +114,9 @@ class RolesTestCase(unittest.TestCase):
         self.assertTrue(self.r_admin not in u1.roles)
 
         # give admin perm
-        r = self.client.post('api/roles', data={'id': str(self.u_2.id),
-                                                'role': 'admin'})
+        r = self.client.post('api/role', content_type='application/json',
+                             data=json.dumps({'id': str(self.u_2.id),
+                                              'role': 'admin'}))
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())
         self.assertTrue(len(data['profile']['roles']) == 1)
@@ -128,36 +131,45 @@ class RolesTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger.id)
             sess['_fresh'] = True
-        r = self.client.put('api/roles')
+        r = self.client.put('api/role')
         self.assertEqual(r.status_code, 302)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_1.id)
             sess['_fresh'] = True
-        r = self.client.put('api/roles')
+        r = self.client.put('api/role')
         self.assertEqual(r.status_code, 302)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_admin.id)
             sess['_fresh'] = True
 
+        # test required inputs
+        r = self.client.put('api/role', content_type='application/json',
+                            data=json.dumps({}))
+        self.assertEqual(r.status_code, 400)
+
         # test 404 error
-        r = self.client.put('api/roles', data={'id': str(self.u_1.id),
-                                               'role': 'patate'})
+        r = self.client.put('api/role', content_type='application/json',
+                            data=json.dumps({'id': str(self.u_1.id),
+                                             'role': 'patate'}))
         self.assertEqual(r.status_code, 404)
 
-        r = self.client.put('api/roles', data={'id': '000000000000000000000000',
-                                               'role': 'logger'})
+        r = self.client.put('api/role', content_type='application/json',
+                            data=json.dumps({'id': '000000000000000000000000',
+                                             'role': 'logger'}))
         self.assertEqual(r.status_code, 404)
 
         # test removing admin to yourself
-        r = self.client.put('api/roles', data={'id': str(self.u_admin.id),
-                                               'role': 'admin'})
+        r = self.client.put('api/role', content_type='application/json',
+                            data=json.dumps({'id': str(self.u_admin.id),
+                                             'role': 'admin'}))
         self.assertEqual(r.status_code, 400)
 
         # remove logger perm
-        r = self.client.put('api/roles', data={'id': str(self.u_logger.id),
-                                               'role': 'logger'})
+        r = self.client.put('api/role', content_type='application/json',
+                            data=json.dumps({'id': str(self.u_logger.id),
+                                             'role': 'logger'}))
         self.assertEqual(r.status_code, 200)
 
         # test response
@@ -171,8 +183,9 @@ class RolesTestCase(unittest.TestCase):
         self.assertTrue(self.r_admin not in logger.roles)
 
         # remove admin perm
-        r = self.client.put('api/roles', data={'id': str(self.u_3.id),
-                                               'role': 'admin'})
+        r = self.client.put('api/role', content_type='application/json',
+                            data=json.dumps({'id': str(self.u_3.id),
+                                             'role': 'admin'}))
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())
         self.assertTrue(len(data['profile']['roles']) == 0)

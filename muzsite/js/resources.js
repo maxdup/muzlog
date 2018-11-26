@@ -18,7 +18,7 @@ module.exports = angular.module('muz.resources',['ngResource', 'ngFileUpload'])
                                interceptor: interceptor}});
   }])
   .factory('UserRoles', ["$resource", function($resource) {
-    return $resource( '/api/roles', {}, {'update':{ method:'PUT'}});
+    return $resource( '/api/role', {}, {'update':{ method:'PUT'}});
   }])
   .service('UploadService', ['$q', 'Upload', function($q, Upload){
     var upload = function(path, file){

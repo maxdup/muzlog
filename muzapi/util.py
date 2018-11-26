@@ -1,4 +1,5 @@
 from flask_restful import fields, marshal
+from flask_restplus import reqparse
 from flask_security import current_user
 from muzapi import Role
 
@@ -54,3 +55,18 @@ def ensure_roles():
         role_logger = Role(name="logger",
                            description="common poster")
         role_logger.save()
+
+
+def parse_request(request, args):
+    data = request.get_json()
+    parser = reqparse.RequestParser()
+    for key, value in args.items():
+        if 'required' in value and value['required']:
+            parser.add_argument(key, **value)
+        elif 'init' in value and value['init']:
+            del value['init']
+            parser.add_argument(key, **value)
+        elif key in data:
+            parser.add_argument(key, **value)
+
+    return parser.parse_args()
