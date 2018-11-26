@@ -34,16 +34,42 @@
                ng-class="active = mb_album.id == release.id"
                ng-click="select_search_result(release)">
               {{release.title}} by {{release['artist-credit'][0].artist.name}}
-              [{{release.media[0].format}}]
-              {{release.country ? ' - ('+release.country+')': ''}}
-              - {{release.date}} {{release.asin ? ' - (asin)': ''}}
             </a>
           </ul>
         </form>
       </div>
 
       <div ng-if="mb_album">
-        <album-summary ng-model="mb_album"></album-summary>
+        <div class="album-summary">
+
+          <div class="row item-layout">
+
+            <div class="col s6 m3 thumbnail">
+              <div class="border">
+                <img class="external" ng-if="!mb_album.thumb && mb_album.mbid" alt=""
+                     ng-src="{{'http://coverartarchive.org/release/' +
+                             mb_album.releases[0].id + '/front-250.jpg'}}">
+              </div>
+            </div>
+
+            <div class="col s12 m9">
+              <a ng-if="enable_edit" ui-sref="edit_album({aid: mb_album.id})"
+                 class="btn-floating btn-large waves-effect waves-light red">
+                <i class="material-icons">edit</i>
+              </a>
+              <h4>{{mb_album.title}} by {{mb_album['artist-credit'][0].artist.name || 'unknown'}}</h4>
+              <div class="summary">
+                <p>
+                  <b>Release Date:</b> {{mb_album['first-release-date'] || 'unknown'}}<br>
+                  <b>Release Type:</b> {{mb_album['primary-type'] || 'unknown'}}<br>
+                  <b>Track Count:</b> {{mb_album.releases[0].media[0]['track-count']}}</br>
+                  <b>MusicBrains ID:</b> {{mb_album.id || 'unknown'}}<br>
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
         <div class="btn-controls">
           <a class="waves-effect waves-light btn" ng-click="unselect_search_result()">
             <i class="material-icons right">close</i>Unselect Album</a>

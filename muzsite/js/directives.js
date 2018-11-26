@@ -55,12 +55,13 @@ module.exports = angular.module('muz.adminDirectives', [])
             })
         }
         $scope.publish = function(){
-          Log.update({id: $scope.log.id, published: true})
-            .$promise.then(function(value){
-              $scope.log = _.extend($scope.log, value.log);
-            }, function(err){
-              $scope.log.published = false;
-            })
+          var publish_backup = $scope.log.published;
+          $scope.log.published = true;
+          Log.update($scope.log).$promise.then(function(value){
+            $scope.log = _.extend($scope.log, value.log);
+          }, function(err){
+            $scope.log.published = publish_backup;
+          })
         }
         $scope.delete_log = function(){
           if (confirm("This log will be deleted")){
@@ -164,16 +165,20 @@ module.exports = angular.module('muz.adminDirectives', [])
           $scope.album = {};
 
           $scope.search = function(search_term){
-            $http.get('http://musicbrainz.org/ws/2/release/?query=' +
+            $http.get('http://musicbrainz.org/ws/2/release-group/?query=' +
                       search_term + '&fmt=json')
               .then(function(value){
-                $scope.search_results = value.data.releases;
+                $scope.search_results = value.data['release-groups'];
               });
           }
 
           $scope.select_search_result = function(result){
-            $scope.mb_album = result;
-            $scope.mb_album.mbid = $scope.mb_album.id;
+            $http.get('http://musicbrainz.org/ws/2/release-group/' +
+                      result.id + '?inc=media+artist-credits+releases&fmt=json')
+              .then(function(value){
+                $scope.mb_album = value.data;
+                $scope.mb_album.mbid = $scope.mb_album.id;
+              });
           }
 
           $scope.unselect_search_result = function(){
@@ -202,10 +207,11 @@ module.exports = angular.module('muz.adminDirectives', [])
             });
           }
           $scope.save_brainz_album = function(){
-            Album.save($scope.mb_album).$promise.then(album_saved);
+            Album.save({'mbid': $scope.mb_album.id})
+                       .$promise.then(album_saved);
           }
 
-        $scope.select_file = function(files){
+          $scope.select_file = function(files){
           if (files.length > 0){
             $scope.cover_file = files[0];
           }
