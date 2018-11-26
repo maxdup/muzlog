@@ -51,16 +51,29 @@ class Message(db.Document):
     meta = {'allow_inheritance': True}
 
 
-class Album(db.Document):
-    mbid = db.StringField(max_length=255, unique=True, sparse=True)
-    asin = db.StringField(max_length=255, unique=True, sparse=True)
+class Product(db.EmbeddedDocument):
+    mbrid = db.StringField(required=True)
+    asin = db.StringField(required=True)
+    country = db.StringField()
+    medium = db.StringField()
 
-    artist = db.StringField(required=True)
+
+class Album(db.Document):
+
+    mbrgid = db.StringField(min_length=36, max_length=36,
+                            unique=True, sparse=True)
+    mbaid = db.StringField(max_length=255)
+
+    products = db.ListField(db.EmbeddedDocumentField(Product))
+
     title = db.StringField(required=True)
+    artist = db.StringField(required=True)
 
     label = db.StringField()
+    release_type = db.StringField()  # have that be a choice?
+    country_code = db.StringField()
     country = db.StringField()
-    release_year = db.IntField()
+
     release_date = db.DateTimeField()
 
     cover = db.StringField()

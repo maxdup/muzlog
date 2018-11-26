@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container albums-list">
   <div class="card">
     <div class="card-content">
       <div class="fixed-action-btn">
@@ -11,6 +11,7 @@
         <thead>
           <tr>
             <th>Status</th>
+            <th>cover</th>
             <th>Release</th>
             <th>Publish Date</th>
           </tr>
@@ -24,6 +25,7 @@
               <i class="material-icons" ng-if="!album.published">
                 pause</i>
             </td>
+            <td><img ng-src="{{$root.conf.img_url + album.thumb}}"/></td>
             <td>{{album.title}} by {{album.artist}} ({{album.release_year}})</td>
             <td>{{album.published_date | date: medium}}</td>
             <td>

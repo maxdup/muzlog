@@ -10,7 +10,6 @@ from muzapi.models import Album, User
 import os
 import uuid
 import requests
-import urllib.request
 import werkzeug
 
 from PIL import Image
@@ -18,19 +17,6 @@ from PIL import Image
 from resizeimage import resizeimage
 
 muzlog_upload = Blueprint('muzlog_upload', __name__)
-
-
-def downloadBrainzCover(mbid):
-    thumb_url = 'http://coverartarchive.org/release/' + mbid + '/front-250.jpg'
-    cover_url = 'http://coverartarchive.org/release/' + mbid + '/front-1200.jpg'
-    thumb_filename = mbid + '-thumb.jpg'
-    cover_filename = mbid + '-cover.jpg'
-    urllib.request.urlretrieve(
-        thumb_url, app.config['UPLOAD_FOLDER'] + thumb_filename)
-    urllib.request.urlretrieve(
-        cover_url, app.config['UPLOAD_FOLDER'] + cover_filename)
-
-    return {'thumb': thumb_filename, 'cover': cover_filename}
 
 
 def save_image(image_file, resource, key, max_size):

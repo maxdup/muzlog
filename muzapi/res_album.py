@@ -8,7 +8,7 @@ from datetime import datetime
 import re
 
 from muzapi.util import DictDiffer
-from muzapi.bp_files import downloadBrainzCover
+from muzapi.util_brainz import downloadBrainzCover
 from muzapi.models import *
 from muzapi.res_log import Log_res
 
@@ -19,7 +19,8 @@ class Album_res(Resource):
         'id': fields.String,
         'artist': fields.String,
         'title': fields.String,
-        'release_year': fields.Integer,
+        'release_year': fields.String(attribute=lambda x: x.release_date.year
+                                      if x.release_date else ''),
         'published': fields.Boolean,
         'published_date': fields.DateTime(dt_format='iso8601'),
         'published_by_username': fields.String(
