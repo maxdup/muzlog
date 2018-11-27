@@ -47,7 +47,7 @@ class Message(db.Document):
     author = db.ReferenceField(User, nullable=False)
     message = db.StringField(Required=True)
 
-    published_date = db.DateTimeField(default=datetime.now())
+    published_date = db.DateField(default=datetime.now())
     published = db.BooleanField(default=False)
 
     meta = {'allow_inheritance': True}
@@ -72,7 +72,7 @@ class Album(db.Document):
     artist = db.StringField(required=True, nullable=False)
 
     label = db.StringField()
-    release_date = db.DateTimeField()
+    release_date = db.DateField()
     release_type = db.StringField()  # have that be a choice?
     country_code = db.StringField()
     country = db.StringField()
@@ -82,7 +82,7 @@ class Album(db.Document):
 
     recommended_by = db.ReferenceField(User, nullable=True)
     published_by = db.ReferenceField(Message)
-    published_date = db.DateTimeField
+    published_date = db.DateField()
 
     logs = db.ListField(db.ReferenceField(Message))
 
@@ -99,7 +99,7 @@ class Comment(db.EmbeddedDocument):
 
 
 class Log(Message):
-    album = db.ReferenceField(Album, nullable=False, required=True)
+    album = db.ReferenceField(Album, required=True, nullable=False)
     recommended = db.BooleanField(default=False)
     recommended_by = db.ReferenceField(Album, nullable=True)
 

@@ -136,11 +136,13 @@ class UsersTestCase(unittest.TestCase):
         r = self.client.put('api/profile',
                             content_type='application/json',
                             data=json.dumps({'id': str(self.u_1.id),
-                                             'bio': 'im not you'}))
+                                             'bio': 'im not you'
+                                             'color': '#555555'}))
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())
         self.assertEqual(data['profile']['id'], str(self.u_1.id))
         self.assertEqual(data['profile']['bio'], 'im not you')
+        self.assertEqual(data['profile']['color'], '#555555')
 
         # test by bad id
         r = self.client.put('api/profile',

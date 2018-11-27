@@ -115,7 +115,7 @@ class AlbumsTestCase(unittest.TestCase):
         self.assertEqual(data['album']['country'], 'canada')
         self.assertEqual(data['album']['country_code'], 'CA')
         self.assertEqual(data['album']['release_type'], 'EP')
-        self.assertEqual(data['album']['release_date'], '20/11/2018')
+        self.assertEqual(data['album']['release_date'], '2018-11-20')
         self.assertEqual(data['album']['label'], 'label obscura')
 
         # assert db
@@ -210,7 +210,7 @@ class AlbumsTestCase(unittest.TestCase):
         self.assertEqual(data['album']['country'], 'canada')
         self.assertEqual(data['album']['country_code'], 'CA')
         self.assertEqual(data['album']['release_type'], 'EP')
-        self.assertEqual(data['album']['release_date'], '20/11/2018')
+        self.assertEqual(data['album']['release_date'], '2018-11-20')
         self.assertEqual(data['album']['label'], 'label obscura')
 
         # assert db

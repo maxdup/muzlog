@@ -11,6 +11,7 @@ from muzapi.util import DictDiffer, fieldsDateOnly, parse_request
 from muzapi.util_brainz import *
 from muzapi.models import *
 from muzapi.res_log import Log_res
+from muzapi.res_user import User_res
 
 
 class Album_res(Resource):
@@ -23,10 +24,18 @@ class Album_res(Resource):
         'release_date': fieldsDateOnly,
         'release_year': fields.String(attribute=lambda x: x.release_date.year
                                       if x.release_date else ''),
-        'published': fields.Boolean(attribute='published_by'),
-        # 'published_date': fields.DateTime(dt_format='iso8601'),
+        'published': fields.Boolean(attribute=lambda x: True
+                                    if x.published_by else False),
+        'published_date': fieldsDateOnly,
         'published_by_username': fields.String(
-            attribute=lambda x: x.published_by.author.username if x.published_by and 'author' in x.published_by and 'username' in x.published_by.author else ''),
+            attribute=lambda x: x.published_by.author.username
+            if x.published_by else ''),
+        'recommended_by_username': fields.String(
+            attribute=lambda x: x.recommended_by.username
+            if x.recommended_by else None),
+        'recommended_by_color': fields.String(
+            attribute=lambda x: x.recommended_by.color
+            if x.recommended_by else None),
         'cover': fields.String,
         'thumb': fields.String,
     }
@@ -38,6 +47,8 @@ class Album_res(Resource):
         'country': fields.String,
         'country_code': fields.String,
         'logs': fields.List(fields.Nested(Log_res.log_fields)),
+        'published_by': fields.Nested(Log_res.log_fields),
+        'recommended_by': fields.Nested(User_res.user_fields),
     }
     album_fields.update(album_fields_base)
 

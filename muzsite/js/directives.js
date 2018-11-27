@@ -72,22 +72,6 @@ module.exports = angular.module('muz.adminDirectives', [])
       }]
     }
   })
-
-  .directive('albumSummary', function() {
-    return {
-      restrict: 'EA',
-      replace: true,
-      scope: { album: "=ngModel" },
-      link : function(scope, element, attrs){
-        scope.enable_edit = attrs.editable != undefined;
-      },
-      templateUrl: '/static/partials/directives/album_summary.html',
-      controller: ["$scope", "conf", function($scope, conf) {
-        $scope.conf = conf;
-      }]
-    }
-  })
-
   .directive('albumDisplay', function(){
     return {
       restrict: 'EA',

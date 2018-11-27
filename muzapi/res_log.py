@@ -1,12 +1,12 @@
 from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
+from flask_restful import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util import DictDiffer
+from muzapi.util import DictDiffer, parse_request, fieldsDateOnly
 from muzapi.models import *
 from muzapi.res_user import User_res
 
@@ -27,7 +27,7 @@ class Log_res(Resource):
         'author': fields.Nested(User_res.user_fields),
         'message': fields.String,
         'published': fields.Boolean,
-        'published_date': fields.DateTime(dt_format='iso8601'),
+        'published_date': fieldsDateOnly,
 
         'recommended': fields.Boolean,
         'comments': fields.List(fields.Nested(comment_fields)),
@@ -58,24 +58,6 @@ class Log_res(Resource):
         'logs': fields.List(fields.Nested(log_album_fields))
     }
 
-    # PUT parser
-    put_parser = reqparse.RequestParser()
-    put_parser.add_argument('id',
-                            required=True, help="album id is required")
-    put_parser.add_argument('message',
-                            required=True, help="message is required")
-    put_parser.add_argument('published_date')
-    put_parser.add_argument('published', type=bool)
-    put_parser.add_argument('recommended', type=bool)
-
-    # POST parser
-    post_parser = put_parser.copy()
-    post_parser.remove_argument('id')
-    post_parser.add_argument('album',
-                             required=True, help="album is required")
-    post_parser.replace_argument('message',
-                                 required=True, help="message is required")
-
     def get(self, _id=None):
         '''
         Get a specific log
@@ -98,35 +80,39 @@ class Log_res(Resource):
 
         # Create an album log
 
-        content = self.post_parser.parse_args()
+        post_args = {
+            'album': {'required': True, 'help': "album is required"},
+            'message': {'required': True, 'help': "message is required"},
+            'published': {'type': bool, 'init': True}, 'published_date': {},
+            'recommended': {'type': bool, 'init': True}}
+
+        content = parse_request(request, post_args)
+
         try:
-            album = Album.objects.get(id=content['album'])
+            content['album'] = Album.objects.get(id=content['album'])
+            content['author'] = current_user.id
+            if 'publish_date' in content:
+                content['published_date'] = datetime.strptime(
+                    content['published_date'], "%d/%m/%Y")
+            elif content['published']:
+                content['published_date'] = datetime.now()
+
         except (DoesNotExist, ValidationError):
             abort(404)
+        except:
+            abort(406)
 
-        log = Log(album=album,
-                  author=current_user.id,
-                  recommended=content['recommended'],
-                  published=content['published'],
-                  message=content['message'])
-
-        if content['published_date']:
-            date = datetime.strptime(content['published_date'], "%d/%m/%Y")
-            log.published_date = date
-        elif content['published']:
-            log.published_date = datetime.now()
-
-        if log.published and not log.album.published:
-            log.album.published = True
-            log.album.published_by = current_user.id
-            log.album.published_date = log.published_date
-
-        if log.recommended and not log.album.recommended:
-            log.album.recommended = log.recommended
-            log.album.recommended_by = current_user.id
-
+        log = Log(**content)
         log.save()
         log.reload()
+
+        if log.published and not log.album.published_by:
+            log.album.published_by = log
+            log.album.published_date = log.published_date
+
+        if log.recommended and not log.album.recommended_by:
+            log.album.recommended_by = log.author
+
         log.album.logs.append(log)
         log.album.save()
 
@@ -140,7 +126,14 @@ class Log_res(Resource):
 
         :param_id: The _id of a Log object to update
         '''
-        content = self.put_parser.parse_args()
+
+        put_args = {
+            'id': {'required': True, 'help': 'album is is require'},
+            'published': {'type': bool}, 'published_date': {},
+            'recommended': {'type': bool}, 'message': {}}
+
+        content = parse_request(request, put_args)
+
         try:
             log = Log.objects.get(id=content['id'])
         except (DoesNotExist, ValidationError):
@@ -154,37 +147,38 @@ class Log_res(Resource):
 
         log.modify(**content)
         log.save()
+        log.reload()
 
-        # mirror log changes in album
         if 'published' in delta:
-            still_published = False
-            for l in log.album.logs:
-                if l.published == True:
-                    still_published = True
-                    log.album.published = True
-                    log.album.published_by = l.author
-                    log.album.published_date = datetime.now()
-                    break
-            if not still_published:
-                log.album.published = False
+            if log.published:
+                if not log.album.published_by or \
+                   log.album.published_by == log:
+                    log.album.published_by = log
+                    log.album.published_date = log.published_date
+            elif log.album.published_by == log:
                 log.album.published_by = None
                 log.album.published_date = None
-            log.album.save()
+                for l in log.album.logs:
+                    if l.published:
+                        log.album.published_by = l
+                        log.album.published_date = l.published_date
+                        break
+
+        if 'published_date' in delta and log.album.published_by == log:
+            log.album.published_date = log.published_date
 
         if 'recommended' in delta:
-            still_recommended = False
-            for l in log.album.logs:
-                if l.recommended:
-                    still_recommended = True
-                    log.album.recommended = True
-                    log.album.recommended_by = l.author
-                    break
-
-            if not still_recommended:
-                log.album.recommended = False
+            if log.recommended:
+                if not log.album.recommended_by:
+                    log.album.recommended_by = log.author
+            elif log.album.recommended_by == log:
                 log.album.recommended_by = None
-            log.album.save()
+                for l in log.album.logs:
+                    if l.recommended:
+                        log.album.recommended_by = l.author
+                        break
 
+        log.album.save()
         return marshal({'log': log}, self.log_album_render)
 
     @login_required

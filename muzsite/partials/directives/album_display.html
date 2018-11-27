@@ -1,6 +1,39 @@
 <div class="card album-display">
   <div class="card-content">
-    <album-summary ng-model="album" editable>
-    </album-summary>
+    <div class="album-summary">
+
+      <div class="row item-layout">
+        <div class="col s6 m3 thumbnail">
+          <div class="border">
+            <img ng-if="album.thumb" ng-src="{{$root.conf.img_url + album.thumb}}"/>
+            <img ng-if="!album.thumb" src="/static/images/placeholder_album.jpg"/>
+          </div>
+        </div>
+
+        <div class="col s12 m9">
+          <a ui-sref="edit_album({aid: album.id})"
+             class="btn-floating btn-large waves-effect waves-light red">
+            <i class="material-icons">edit</i>
+          </a>
+          <h4>
+            {{album.title}} by {{album.artist ||
+            album['artist-credit'][0].artist.name || 'unknown'}}
+          </h4>
+          <div class="summary">
+            <p>
+              <b>Release date:</b> <span ng-if="album.date || album.release_date">
+                {{ album.date || album.release_date | date: medium : UTC}}</span>
+              <span ng-if="!album.date && !album.release_date">
+                {{album.release_year || 'unknown'}}</span><br>
+              <b>Record Label:</b> {{ album.label ||
+              album['label-info'][0].label.name || 'unknown'}}<br>
+              <b>Country:</b> {{album.country  || 'unknown'}}<br>
+              <b>MusicBrains ID:</b> {{album.mbrgid || 'unknown'}}<br>
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

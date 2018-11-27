@@ -37,7 +37,7 @@
             <p>{{log.message}}</p>
           </div>
           <div class="row">
-            <span class="col s6">{{log.published_date | date: medium}}</span>
+            <span class="col s6">{{log.published_date | date : medium : 'UTC'}}</span>
             <span class="col s6">{{log.recommended ? 'Recommended': 'Not Recommended'}}</span>
           </div>
           <div class="btn-controls"
