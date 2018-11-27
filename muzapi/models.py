@@ -2,6 +2,7 @@ from flask_security import UserMixin, RoleMixin
 from flask_security.core import _security
 from datetime import datetime
 from . import db
+import re
 
 
 class Role(db.Document, RoleMixin):
@@ -21,7 +22,8 @@ class User(db.Document, UserMixin):
 
     username = db.StringField(max_length=75, nullable=False)
     bio = db.StringField(max_length=400, nullable=True)
-    color = db.StringField(min_length=7, max_length=7, nullable=True)
+    re_color = re.compile('^#[A-Fa-f0-9]{6}$|^#[A-Fa-f0-9]{3}$')
+    color = db.StringField(regex=re_color)
 
     avatar = db.StringField(default="")
     thumb = db.StringField(default="")

@@ -74,7 +74,7 @@ def parse_request(request, args):
         elif 'init' in value and value['init']:
             del value['init']
             parser.add_argument(key, **value)
-        elif key in data:
+        elif data and key in data:
             parser.add_argument(key, **value)
 
     return parser.parse_args()

@@ -60,23 +60,23 @@ class User_res(Resource):
 
         # Update User
 
-        args = {'id': {}, 'bio': {}, 'color': {}, 'username': {}}
+        args = {'id': {'required': True, 'help': 'User id is required'},
+                'bio': {}, 'color': {}, 'username': {}}
         content = parse_request(request, args)
 
-        if 'id' in content:
-            if content['id'] == str(current_user.id):
-                user = current_user
-            elif current_user.has_role('admin'):
-                try:
-                    user = User.objects.get(id=content['id'])
-                except (DoesNotExist, ValidationError):
-                    abort(404)
-            else:
-                abort(403)
-        else:
+        if content['id'] == str(current_user.id):
             user = current_user
-
-        user.modify(**content)
-        user.save()
+        elif current_user.has_role('admin'):
+            try:
+                user = User.objects.get(id=content['id'])
+            except (DoesNotExist, ValidationError):
+                abort(404)
+        else:
+            abort(403)
+        try:
+            user.modify(**content)
+            user.save()
+        except ValidationError:
+            abort(406)
 
         return marshal({'profile': user}, self.user_render)
