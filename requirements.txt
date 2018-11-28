@@ -1,8 +1,12 @@
 flask
 flask-cors
 flask_restful
+flask_restplus
 flask-security
+mongoengine
 flask-mongoengine
+musicbrainzngsOB
 faker
+bcrypt
 python-resize-image
 coverage
