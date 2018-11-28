@@ -57,15 +57,19 @@ def downloadBrainzCover(mbrid):
     return {'thumb': thumb_filename, 'cover': cover_filename}
 
 
-def album_from_mb_release_group(mbrgid, verbose=False):
+def album_from_mb_release_group(mbrgid, album, verbose=False):
 
     # get an album object from a musicbrainz id
-    try:
-        album = Album.objects.get(mbrgid=mbrgid)
-        return album
-    except (DoesNotExist, ValidationError):
-        album = Album()
+
+    if album:
         album.mbrgid = mbrgid
+    else:
+        try:
+            album = Album.objects.get(mbrgid=mbrgid)
+            return album
+        except (DoesNotExist, ValidationError):
+            album = Album()
+            album.mbrgid = mbrgid
 
     musicbrainzngs.set_useragent(
         "Muzlogger",

@@ -136,7 +136,7 @@ class UsersTestCase(unittest.TestCase):
         r = self.client.put('api/profile',
                             content_type='application/json',
                             data=json.dumps({'id': str(self.u_1.id),
-                                             'bio': 'im not you'
+                                             'bio': 'im not you',
                                              'color': '#555555'}))
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())

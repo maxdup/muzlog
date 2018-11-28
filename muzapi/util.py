@@ -16,7 +16,7 @@ class stringRestricted(fields.String):
 
 class fieldsDateOnly(fields.String):
     def output(self, key, obj):
-        if key in obj and isinstance(obj[key], datetime.datetime):
+        if obj and key in obj and isinstance(obj[key], datetime.datetime):
             return obj[key].strftime('%d/%m/%Y')
         return fields.String.output(self, key, obj)
 

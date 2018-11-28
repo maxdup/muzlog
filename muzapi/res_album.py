@@ -73,7 +73,7 @@ class Album_res(Resource):
             return marshal({'album': album}, self.album_render)
         else:
             albums = Album.objects(deleted=False).order_by(
-                'published_by', '-published_date')
+                '-published_date')
             return marshal({'albums': albums}, self.albums_render)
 
     @login_required
@@ -134,6 +134,9 @@ class Album_res(Resource):
         if 'release_date' in delta and content['release_date']:
             album.release_year = album.release_date.year
 
+        if 'mbrgid' in delta and content['mbrgid']:
+            album = album_from_mb_release_group(content['mbrgid'], album)
+
         album.save()
 
         return marshal({'album': album}, self.album_render)
@@ -150,6 +153,9 @@ class Album_res(Resource):
             album = Album.objects.get(id=_id)
         except (DoesNotExist, ValidationError):
             abort(404)
+
+        if album.logs:
+            return (400)
 
         album.deleted = True
         album.save()
