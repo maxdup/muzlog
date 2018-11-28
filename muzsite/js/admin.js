@@ -1,14 +1,4 @@
-window.$ = require("expose-loader?$!jquery");
-require('@uirouter/angularjs');
-require('angular-animate/angular-animate.js');
-
-require('./album_controller.js');
-require('./user_controller.js');
-require('./log_controller.js');
-require('./resources.js');
-require('./directives.js');
-
-module.exports = angular.module('muzApp', [
+angular.module('muzApp', [
   'ui.materialize', 'ui.router', 'ngAnimate', 'muz.resources',
   'muz.albumCtrl', 'muz.userCtrl', 'muz.logCtrl', 'muz.adminDirectives'])
   .config([
@@ -64,10 +54,11 @@ module.exports = angular.module('muzApp', [
       $locationProvider.html5Mode(true);
     }])
   .constant('conf', { img_url: 'http://127.0.0.1/muzlogcovers/'})
-  .controller('RootController', [
-    "$rootScope", "Profile", "conf", function($rootScope, Profile, conf){
+  .controller(
+    'RootController',
+    function($rootScope, Profile, conf){
       $rootScope.conf = conf;
       Profile.me().$promise.then(function(value){
         $rootScope.profile = value.profile;
       });
-    }]);
+    });

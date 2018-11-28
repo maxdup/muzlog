@@ -1,4 +1,4 @@
-module.exports = angular.module('muz.logCtrl', [])
+angular.module('muz.logCtrl', [])
   .controller('CreateLogController', [
     '$stateParams', '$scope', 'Album', '$http',
     function($stateParams, $scope, Album, $http) {

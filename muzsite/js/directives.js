@@ -1,5 +1,4 @@
-_ = require('lodash');
-module.exports = angular.module('muz.adminDirectives', [])
+angular.module('muz.adminDirectives', [])
 
   .directive('logCreator', function(){
     return {

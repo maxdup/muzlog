@@ -1,11 +1,4 @@
-require('jquery/dist/jquery.js')
-require('angular/angular.js');
-require('angular-animate/angular-animate.js');
-require('angular-resource/angular-resource.js');
-require('@uirouter/angularjs');
-
-
-module.exports = angular.module('muzApp', [
+angular.module('muzApp', [
   'ui.router', 'ngAnimate', 'muz.adminCtrl'])
   .config([
     "$locationProvider", "$stateProvider", "$urlRouterProvider",

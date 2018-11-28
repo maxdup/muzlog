@@ -1,4 +1,4 @@
-module.exports = angular.module('muz.albumCtrl', [])
+angular.module('muz.albumCtrl', [])
 
   .controller('ViewAlbumsController', [
     '$scope', 'Album', function($scope, Album) {

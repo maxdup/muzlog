@@ -1,5 +1,4 @@
-require('ng-file-upload');
-module.exports = angular.module('muz.userCtrl', [])
+angular.module('muz.userCtrl', [])
 
   .controller('ViewProfilesController', [
     "$scope", "Profile", function($scope, Profile){
