@@ -57,7 +57,7 @@ def downloadBrainzCover(mbrid):
     return {'thumb': thumb_filename, 'cover': cover_filename}
 
 
-def album_from_mb_release_group(mbrgid, album, verbose=False):
+def album_from_mb_release_group(mbrgid, album=None, verbose=False):
 
     # get an album object from a musicbrainz id
 

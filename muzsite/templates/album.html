@@ -45,7 +45,7 @@
           <div class="card-content">
             <h5>{{log.author.username}}'s log</h5>
             <p class="date">{{log.published_date}}</p>
-            <p>{{log.message}}</p>
+            <p>{{log.message|safe}}</p>
             <div class="escape">
               <div class="avatar">
                 <div class="border" style="background: {{log.author.color}}">
