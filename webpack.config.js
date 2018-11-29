@@ -10,14 +10,11 @@ module.exports = {
   entry: {
     vendor: [
       "./node_modules/reset-css/sass/_reset.scss",
+      "./node_modules/jquery/dist/jquery.min.js",
     ],
-    base: [
+    site: [
       rootAssetPath + "/scss/security.scss",
-    ],
-    app: [
-      rootAssetPath + "/scss/security.scss",
-      rootAssetPath + "/scss/app.scss",
-      rootAssetPath + "/js/app.js",
+      rootAssetPath + "/scss/site.scss"
     ],
     app_admin: [
       rootAssetPath + "/scss/security.scss",

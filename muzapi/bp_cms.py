@@ -1,4 +1,4 @@
-from flask import current_app as app, Blueprint, request
+from flask import current_app as app, Blueprint, request, render_template, session
 from flask_security import current_user, roles_accepted, login_required
 from flask_restful import abort, reqparse
 
@@ -16,33 +16,19 @@ from PIL import Image
 
 from resizeimage import resizeimage
 
-muzlog_upload = Blueprint('muzlog_upload', __name__)
+muzlog_cms = Blueprint('muzlog_cms', __name__)
 
 
-def save_image(image_file, resource, key, max_size):
-    file_id = str(uuid.uuid4())
-    resource[key] = file_id + '-avatar.jpg'
-    resource.thumb = file_id + '-thumb.jpg'
-
-    try:
-        with Image.open(image_file) as image:
-            size = min(min(image.height, image.width), max_size)
-            image_file = resizeimage.resize_cover(image, [size, size])
-            image_file.save(os.path.join(
-                app.config['UPLOAD_FOLDER'], resource[key]), image.format)
-
-            thumb_file = resizeimage.resize_cover(image, [250, 250])
-            thumb_file.save(os.path.join(
-                app.config['UPLOAD_FOLDER'], resource.thumb), image.format)
-            resource.save()
-    except Exception as e:
-        print(e)
-        return False
-
-    return resource[key]
+@muzlog_cms.route('/cms/', defaults={'path': '', 'param': ''})
+@muzlog_cms.route('/cms/<path:path>', defaults={'param': ''})
+@muzlog_cms.route('/cms/<path:path>/<path:param>')
+@login_required
+@roles_accepted('admin', 'logger')
+def admin_app(path, param):
+    return render_template('/admin.html')
 
 
-@muzlog_upload.route('/api/upload_album_cover/<_id>', methods=['POST'])
+@muzlog_cms.route('/api/upload_album_cover/<_id>', methods=['POST'])
 @login_required
 @roles_accepted('admin', 'logger')
 def upload_cover(_id=None):
@@ -68,7 +54,7 @@ def upload_cover(_id=None):
     return (album.cover, 200)
 
 
-@muzlog_upload.route('/api/upload_profile_avatar/<_id>', methods=['POST'])
+@muzlog_cms.route('/api/upload_profile_avatar/<_id>', methods=['POST'])
 @login_required
 @roles_accepted('admin', 'logger')
 def upload_avatar(_id=None):
@@ -99,3 +85,26 @@ def upload_avatar(_id=None):
         abort(400)
 
     return (user.avatar, 200)
+
+
+def save_image(image_file, resource, key, max_size):
+    file_id = str(uuid.uuid4())
+    resource[key] = file_id + '-avatar.jpg'
+    resource.thumb = file_id + '-thumb.jpg'
+
+    try:
+        with Image.open(image_file) as image:
+            size = min(min(image.height, image.width), max_size)
+            image_file = resizeimage.resize_cover(image, [size, size])
+            image_file.save(os.path.join(
+                app.config['UPLOAD_FOLDER'], resource[key]), image.format)
+
+            thumb_file = resizeimage.resize_cover(image, [250, 250])
+            thumb_file.save(os.path.join(
+                app.config['UPLOAD_FOLDER'], resource.thumb), image.format)
+            resource.save()
+    except Exception as e:
+        print(e)
+        return False
+
+    return resource[key]
