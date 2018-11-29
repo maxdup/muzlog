@@ -1,15 +1,33 @@
 from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort
+from flask_restplus import Resource, fields, marshal, marshal_with, abort
+
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
 from muzapi.util import parse_request
+from muzapi.util_rest import listRestricted, stringRestricted
 from muzapi.models import User, Role
 from muzapi.res_user import User_res
 
 
 class Role_res(Resource):
 
+    user_fields = {
+        'id': fields.String,
+        'email': stringRestricted,
+
+        'bio': fields.String,
+        'username': fields.String,
+        'color': fields.String,
+
+        'avatar': fields.String,
+        'thumb': fields.String,
+
+        'roles': fields.List(fields.String()),
+    }
+    user_render = {
+        'profile': fields.Nested(user_fields)
+    }
     roles_fields = {
         'roles': fields.List(fields.String()),
     }
@@ -19,6 +37,7 @@ class Role_res(Resource):
 
     @login_required
     @roles_accepted('admin')
+    @marshal_with(roles_fields)
     def get(self):
 
         # Get All Roles
@@ -27,6 +46,7 @@ class Role_res(Resource):
 
     @login_required
     @roles_accepted('admin')
+    @marshal_with(user_render)
     def post(self):
 
         # Add a role
@@ -42,10 +62,11 @@ class Role_res(Resource):
             user.roles.append(role)
             user.save()
 
-        return marshal({'profile': user}, User_res.user_render)
+        return {'profile': user}
 
     @login_required
     @roles_accepted('admin')
+    @marshal_with(user_render)
     def put(self):
 
         # Revoke a role
@@ -65,4 +86,4 @@ class Role_res(Resource):
             user.roles = [x for x in user.roles if x.id != role.id]
             user.save()
 
-        return marshal({'profile': user}, User_res.user_render)
+        return {'profile': user}
