@@ -1,10 +1,14 @@
 {% include "_head.html" %}
-{% from "_field_macros.html" import render_field_with_errors, render_field %}
-<div class="row valign-wrapper" style="min-height: 80vh">
-  <div class="col s8 offset-s2 card">
-    <div class="card-content">
-      {% block content %}
-      {% endblock %}
+<body>
+  {% include "_messages.html" %}
+  {% include "_nav.html"%}
+  {% from "_field_macros.html" import render_field_with_errors, render_field %}
+  <div class="row valign-wrapper" style="min-height: 80vh">
+    <div class="col s8 offset-s2 card">
+      <div class="card-content">
+        {% block content %}
+        {% endblock %}
+      </div>
     </div>
   </div>
-</div>
+</body>

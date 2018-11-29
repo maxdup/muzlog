@@ -1,24 +1,28 @@
 {% include "_head.html" %}
-{% from "_macros.html" import render_field_with_errors, render_field %}
-<div class="container">
-  <div class="row">
-    {% for album in albums %}
-    <a class="col s6 m4 xl2" href="/album/{{album.id}}">
-      <div class="album-preview" >
-        {% if album.thumb %}
-        {% if config.DEBUG %}
-        <img class="cover" src="http://127.0.0.1/muzlogcovers/{{album.thumb}}"/>
-        {% else %}
-        <img class="cover" src="/muzlogcovers/{{album.thumb}}"/>
-        {% endif %}
-        {% else %}
-        <img class="cover placeholder" src="/static/images/placeholder_album.jpg"/>
-        {% endif %}
-        <div class="title">
-          <span>{{ album.title }}</span></br> {{ album.artist }}
+<body>
+  {% include "_messages.html" %}
+  {% include "_nav.html"%}
+  {% from "_macros.html" import render_field_with_errors, render_field %}
+  <div class="container">
+    <div class="row">
+      {% for album in albums %}
+      <a class="col s6 m4 xl2" href="/album/{{album.id}}">
+        <div class="album-preview" >
+          {% if album.thumb %}
+          {% if config.DEBUG %}
+          <img class="cover" src="http://127.0.0.1/muzlogcovers/{{album.thumb}}"/>
+          {% else %}
+          <img class="cover" src="/muzlogcovers/{{album.thumb}}"/>
+          {% endif %}
+          {% else %}
+          <img class="cover placeholder" src="/static/images/placeholder_album.jpg"/>
+          {% endif %}
+          <div class="title">
+            <span>{{ album.title }}</span></br> {{ album.artist }}
+          </div>
         </div>
-      </div>
-    </a>
-    {% endfor %}
+      </a>
+      {% endfor %}
+    </div>
   </div>
-</div>
+</body>

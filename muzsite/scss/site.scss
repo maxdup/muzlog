@@ -1,3 +1,6 @@
+body {
+    background: bisque;
+}
 .album-preview {
     padding-bottom: 100%;
     position: relative;
@@ -57,6 +60,154 @@
         }
         >div{
             opacity: 1;
+        }
+    }
+}
+
+.review {
+    background: black;
+    overflow: visible;
+    .background {
+        height: 300px;
+        max-height: 50vh;
+        position: relative;
+        overflow: hidden;
+        .container {
+            height: 100%;
+            position: relative;
+        }
+        img {
+            z-index: 0;
+            filter: blur(3px) brightness(50%);
+            width: 110%;
+            height: auto;
+            position: absolute;
+            top: 0px;
+            left: -30px;
+            right: -30px;
+            bottom: 0;
+            margin: auto;
+        }
+    }
+    .content {
+        background-color: #fff;
+        position: relative;
+        .card {
+            margin-top: 75px;
+            margin-left: 120px;
+            padding-left: 30px;
+            padding-right: 10px;
+            box-shadow: 0px 5px 29px 1px #4d4c4c;
+            max-width: 800px;
+            .card-content {
+                max-width: 700px;
+                padding-bottom: 35px;
+            }
+            h5 {
+                display: inline-block;
+                margin-bottom: 15px;
+            }
+            .date {
+                margin-top: 15px;
+                float: right;
+                color: grey;
+            }
+            .escape {
+                width: 150px;
+                height: 150px;
+                position: absolute;
+                left: -120px;
+                top: -25px;
+            }
+            .avatar {
+                width: 100%;
+                height: 0;
+                padding-bottom: 100%;
+                position: absolute;
+                >div {
+	                position: relative
+                }
+                .border {
+                    box-shadow: 4px 4px 17px -2px #6d6d6d;
+                    overflow: hidden;
+                    position: relative;
+                    width: 100%;
+                    height: auto;
+                    padding-bottom: 100%;
+                    border-radius: 50%;
+                    background: black;
+
+                    a {
+                        position: absolute;
+                        border-radius: 50%;
+                        z-index: 10;
+                        padding: 0;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        &:hover {
+                            background: white;
+                            opacity: 0.3;
+                        }
+                    }
+                }
+                img {
+                    position:absolute;
+                    margin: auto;
+                    top:0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    width: 93%;
+                    height: auto;
+                    max-height: 93%;
+                    border-radius: 50%;
+                }
+                .img-container {
+                    width: 90%;
+                    height: 90%;
+                    border-radius: 50%;
+
+                    overflow: hidden;
+                }
+            }
+        }
+        .header {
+            .col {
+                display: inline-block;
+                float: none;
+                vertical-align: bottom;
+                h1 {
+                    margin-bottom: 0px;
+                }
+                h3 {
+                    margin-top: 0px;
+                }
+                &.s8 {
+                    width: 65%;
+                }
+            }
+            .cover {
+                position: relative;
+                .contain {
+                    box-shadow: 0px 5px 29px 1px #4d4c4c;
+                    background: white;
+                    width: 100%;
+                    padding-bottom: 100%;
+                    position: absolute;
+                    bottom: 0;
+                }
+                img {
+                    position:absolute;
+                    width: 90%;
+                    height: auto;
+                    top: 5%;
+                    left: 5%;
+                    right: 5%;
+                    bottom: 5%;
+                }
+            }
         }
     }
 }

@@ -1,3 +1,70 @@
-<div>
-  hi I'm an album
-</div>
+{% include "_head.html" %}
+<body style="background: white;">
+  {% include "_messages.html" %}
+  {% include "_nav.html"%}
+  {% from "_macros.html" import render_field_with_errors, render_field %}
+  <div class="review">
+    <div class="background">
+      <div class="container">
+        {% if album.thumb %}
+        {% if config.DEBUG %}
+        <img src="http://127.0.0.1/muzlogcovers/{{album.cover}}"/>
+        {% else %}
+        <img src="/muzlogcovers/{{album.cover}}"/>
+        {% endif %}
+        {% else %}
+        <img src="/static/images/placeholder_album.jpg"/>
+        {% endif %}
+      </div>
+    </div>
+    <div class="content">
+      <div class="container">
+        <div class="row header">
+          <div class="col s4">
+            <div class="cover">
+              <div class="contain">
+                {% if album.thumb %}
+                {% if config.DEBUG %}
+                <img src="http://127.0.0.1/muzlogcovers/{{album.cover}}"/>
+                {% else %}
+                <img src="/muzlogcovers/{{album.cover}}"/>
+                {% endif %}
+                {% else %}
+                <img src="/static/images/placeholder_album.jpg"/>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col s8">
+            <h1>{{album.title}}</h1>
+            <h3>by {{album.artist}}</h3>
+          </div>
+        </div>
+        {% for log in album.logs %}
+        <div class="card">
+          <div class="card-content">
+            <h5>{{log.author.username}}'s log</h5>
+            <p class="date">{{log.published_date}}</p>
+            <p>{{log.message}}</p>
+            <div class="escape">
+              <div class="avatar">
+                <div class="border" style="background: {{log.author.color}}">
+                  {% if log.author.thumb %}
+                  {% if config.DEBUG %}
+                  <img src="http://127.0.0.1/muzlogcovers/{{log.author.thumb}}"/>
+                  {% else %}
+                  <img src="/muzlogcovers/{{log.author.thumb}}"/>
+                  {% endif %}
+                  {% else %}
+                  <img src="/static/images/placeholder_logger.jpg"/>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</body>
