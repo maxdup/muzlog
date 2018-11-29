@@ -5,7 +5,7 @@
     <div class="col s6 m2 thumbnail">
       <div class="border">
         <div class="img-container" ngf-background="cover_file"></div>
-        <img ng-src="{{conf.img_url + album.thumb}}"
+        <img ng-src="{{$root.img_url + album.thumb}}"
              ng-if="album.thumb && !cover_file"/>
         <img src="/static/images/placeholder_album.jpg"
              ng-if="!album.thumb && !cover_file">

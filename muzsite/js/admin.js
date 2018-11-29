@@ -63,10 +63,10 @@ module.exports = angular.module('muzApp', [
       });
       $locationProvider.html5Mode(true);
     }])
-  .constant('conf', { img_url: 'http://127.0.0.1/muzlogcovers/'})
   .controller('RootController', [
-    "$rootScope", "Profile", "conf", function($rootScope, Profile, conf){
-      $rootScope.conf = conf;
+    "$rootScope", "Profile", function($rootScope, Profile){
+      $rootScope.img_url = window.env == 'debug' ?
+        'http://127.0.0.1/muzlogcovers/' : '/muzlogcovers/';
       Profile.me().$promise.then(function(value){
         $rootScope.profile = value.profile;
       });

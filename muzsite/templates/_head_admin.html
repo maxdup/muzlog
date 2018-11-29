@@ -8,7 +8,7 @@
   <script src="/static/app_admin.js"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
         rel="stylesheet">
-
+  <script>env = {%if config.DEBUG%} 'debug' {%else%} 'prod' {%endif%}</script>
   <base href="/cms">
 </head>
 <body ng-app="muzApp" ng-controller="RootController">

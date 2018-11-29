@@ -5,7 +5,7 @@
       <div class="col s5 m2 thumbnail cover" ng-if="display == 'album'">
         <div class="border">
           <img ng-if="log.album.thumb"
-               ng-src="{{conf.img_url + log.album.thumb}}">
+               ng-src="{{$root.img_url + log.album.thumb}}">
           <img ng-if="!log.album.thumb"
                src="/static/images/placeholder_logger.jpg">
         </div>
@@ -13,7 +13,7 @@
       <div class="col s5 m2 thumbnail avatar" ng-if="display == 'author'">
         <div class="border" ng-style="{background: log.author.color}">
           <img ng-if="log.author.thumb"
-               ng-src="{{conf.img_url + log.author.thumb}}">
+               ng-src="{{$root.img_url + log.author.thumb}}">
           <img ng-if="!log.author.thumb"
                src="/static/images/placeholder_logger.jpg">
         </div>

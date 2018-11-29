@@ -37,9 +37,8 @@ module.exports = angular.module('muz.adminDirectives', [])
         onDelete: '&',
       },
       templateUrl: '/static/partials/directives/log_display.html',
-      controller: ["$scope", "Log", "conf", function($scope, Log, conf) {
+      controller: ["$scope", "Log", function($scope, Log) {
 
-        $scope.conf = conf;
         $scope.open_edit = function(){
           $scope.backup = _.cloneDeep($scope.log);
         }
@@ -89,9 +88,8 @@ module.exports = angular.module('muz.adminDirectives', [])
       },
       templateUrl: '/static/partials/directives/profile_display.html',
       controller: [
-        "$state", "$scope", "Profile", "conf", 'UploadService',
-        function($state, $scope, Profile, conf, UploadService) {
-          $scope.conf = conf;
+        "$state", "$scope", "Profile", 'UploadService',
+        function($state, $scope, Profile, UploadService) {
           $scope.enable_edit = true;
           $scope.open_edit = function(){
             $scope.backup = _.cloneDeep($scope.profile);
@@ -143,9 +141,8 @@ module.exports = angular.module('muz.adminDirectives', [])
       },
       templateUrl: '/static/partials/directives/album_create.html',
       controller: [
-        "$state", "$scope", "$http", "Album", "UploadService", "conf", "$q",
-        function($state, $scope, $http, Album, UploadService, conf, $q) {
-          $scope.conf = conf;
+        "$state", "$scope", "$http", "Album", "UploadService", "$q",
+        function($state, $scope, $http, Album, UploadService, $q) {
           $scope.album = {};
 
           $scope.search = function(search_term){

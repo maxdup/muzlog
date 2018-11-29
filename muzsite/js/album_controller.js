@@ -8,9 +8,8 @@ module.exports = angular.module('muz.albumCtrl', [])
     }])
 
   .controller('EditAlbumController', [
-    '$state', '$stateParams', '$scope', 'Album', 'UploadService', '$q', 'conf',
-    function($state, $stateParams, $scope, Album, UploadService, $q, conf) {
-      $scope.conf = conf;
+    '$state', '$stateParams', '$scope', 'Album', 'UploadService', '$q',
+    function($state, $stateParams, $scope, Album, UploadService, $q) {
 
       Album.get({id:$stateParams.aid})
         .$promise.then(function(value){

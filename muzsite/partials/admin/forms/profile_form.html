@@ -4,7 +4,7 @@
     <div class="col s6 m2 thumbnail avatar">
       <div class="border" ng-style="{background: profile.color}">
         <div class="img-container" ngf-background="avatar_file"></div>
-        <img ng-src="{{conf.img_url + profile.thumb}}"
+        <img ng-src="{{$root.img_url + profile.thumb}}"
              ng-if="profile.thumb && !avatar_file"/>
         <img src="/static/images/placeholder_logger.jpg"
              ng-if="!profile.thumb && !avatar_file">
