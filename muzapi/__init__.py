@@ -33,7 +33,7 @@ def create_app(config):
     mail = Mail(app)
     db.init_app(app)
 
-    api = RestApi(app, doc='/doc/')
+    api = Api(app, doc='/doc/')
 
     api.add_resource(Album_res, "/api/album", endpoint="albums")
     api.add_resource(Album_res, "/api/album/<string:_id>", endpoint="album")
