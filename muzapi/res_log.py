@@ -88,7 +88,7 @@ class Log_res(Resource):
             'published': {'type': bool, 'init': True}, 'published_date': {},
             'recommended': {'type': bool, 'init': True}}
 
-        content = parse_request(request, post_args)
+        content = parse_request(post_args)
 
         try:
             content['album'] = Album.objects.get(id=content['album'])
@@ -129,7 +129,7 @@ class Log_res(Resource):
             'published': {'type': bool}, 'published_date': {},
             'recommended': {'type': bool}, 'message': {}}
 
-        content = parse_request(request, put_args)
+        content = parse_request(put_args)
 
         try:
             log = Log.objects.get(id=content['id'])
