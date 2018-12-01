@@ -91,11 +91,6 @@ class Log_res(Resource):
         try:
             content['album'] = Album.objects.get(id=content['album'])
             content['author'] = current_user.id
-            if 'publish_date' in content:
-                content['published_date'] = datetime.strptime(
-                    content['published_date'], "%d/%m/%Y")
-            elif content['published']:
-                content['published_date'] = datetime.now()
 
         except (DoesNotExist, ValidationError):
             abort(404)
