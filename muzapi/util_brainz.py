@@ -1,6 +1,6 @@
 from flask import current_app as app
-from flask_restful import fields, marshal
 from flask_security import current_user
+from flask_restplus import abort
 from muzapi import Role
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
@@ -75,10 +75,12 @@ def album_from_mb_release_group(mbrgid, album=None, verbose=False):
         "Muzlogger",
         "0.1",
         "https://github.com/maxdup/muzlog")
-
-    rg = musicbrainzngs.get_release_group_by_id(
-        id=mbrgid, includes=['artists', 'artist-credits',
-                             'releases', 'media'])['release-group']
+    try:
+        rg = musicbrainzngs.get_release_group_by_id(
+            id=mbrgid, includes=['artists', 'artist-credits',
+                                 'releases', 'media'])['release-group']
+    except musicbrainzngs.musicbrainz.ResponseError:
+        abort(404)
 
     # set artist name, artist id, album title and release type
     album.artist = rg['artist-credit-phrase']

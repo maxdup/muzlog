@@ -4,7 +4,7 @@ import unittest
 import requests
 import json
 
-from muzapi.models import User, Role, Album
+from muzapi.models import *
 from muzapi.util import ensure_roles
 from muzapi import create_app
 
@@ -36,6 +36,16 @@ class AlbumsTestCase(unittest.TestCase):
             self.album.save()
             self.album.reload()
 
+            self.album_logged = fake_album()
+            self.album_logged.save()
+            self.album_logged.reload()
+
+            log = Log(message="hi",
+                      album=self.album_logged)
+            log.save()
+            self.album_logged.logs = [log]
+            self.album_logged.save()
+
             self.deleted_album = fake_album()
             self.deleted_album.deleted = True
             self.deleted_album.save()
@@ -45,11 +55,10 @@ class AlbumsTestCase(unittest.TestCase):
         return
 
     def test_get_albums(self):
-        # todo: elaborate
         r = self.client.get('api/album',
                             headers={'content-type': 'application/json'})
         data = json.loads(r.data.decode())
-        self.assertEqual(len(data['albums']), 1)
+        self.assertEqual(len(data['albums']), 2)
         self.assertEqual(r.status_code, 200)
 
         r = self.client.get('api/album/' + str(self.album.id),
@@ -127,6 +136,11 @@ class AlbumsTestCase(unittest.TestCase):
         self.assertEqual(album.release_type, 'EP')
         self.assertEqual(album.label, 'label obscura')
 
+        # Test mbrgid non existing mbrgid
+        r = self.client.post('api/album', content_type='application/json',
+                             data=json.dumps({'mbrgid': '00000000-7add-3911-0000-9062e28e4c37'}))
+        self.assertEqual(r.status_code, 404)
+
         # Test mbrgid post
         r = self.client.post('api/album', content_type='application/json',
                              data=json.dumps({'mbrgid': 'f32fab67-77dd-3937-addc-9062e28e4c37'}))
@@ -151,6 +165,25 @@ class AlbumsTestCase(unittest.TestCase):
         self.assertEqual(album.release_type, 'Album')
         self.assertTrue(album.release_date)
         self.assertTrue(album.label)
+
+        # Test mbrgid undelete
+        r = self.client.post('api/album', content_type='application/json',
+                             data=json.dumps({'mbrgid': 'f32fab67-77dd-3937-addc-9062e28e4c37'}))
+        self.assertEqual(r.status_code, 200)
+        data = json.loads(r.data.decode())['album']
+        deleted_id = data['id']
+        r = self.client.delete('api/album/' + deleted_id,
+                               content_type='application/json')
+        album = Album.objects.get(id=deleted_id)
+        self.assertTrue(album.deleted)
+        self.assertEqual(r.status_code, 200)
+        r = self.client.post('api/album', content_type='application/json',
+                             data=json.dumps({'mbrgid': 'f32fab67-77dd-3937-addc-9062e28e4c37'}))
+        self.assertEqual(r.status_code, 200)
+        data = json.loads(r.data.decode())['album']
+        self.assertEqual(data['id'], deleted_id)
+        album = Album.objects.get(id=deleted_id)
+        self.assertFalse(album.deleted)
 
     def test_put_album(self):
         with self.client.session_transaction() as sess:
@@ -222,6 +255,16 @@ class AlbumsTestCase(unittest.TestCase):
         self.assertEqual(album.release_type, 'EP')
         self.assertEqual(album.label, 'label obscura')
 
+        # Test mbrgid put
+        r = self.client.put('api/album', content_type='application/json',
+                            data=json.dumps({'id': str(self.album.id),
+                                             'mbrgid': 'f32fab67-77dd-3937-addc-9062e28e4c37'}))
+        self.assertEqual(r.status_code, 200)
+        data = json.loads(r.data.decode())['album']
+        self.assertEqual(data['mbrgid'],
+                         'f32fab67-77dd-3937-addc-9062e28e4c37')
+        self.assertEqual(data['artist'], 'Michael Jackson')
+
     def test_delete_album(self):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_2.id)
@@ -237,6 +280,11 @@ class AlbumsTestCase(unittest.TestCase):
         r = self.client.delete('api/album', content_type='application/json',
                                data=json.dumps({}))
         self.assertEqual(r.status_code, 404)
+
+        # Test failed delete for logged albums
+        r = self.client.delete('api/album/'+str(self.album_logged.id),
+                               content_type='application/json')
+        self.assertEqual(r.status_code, 400)
 
         # Test complete delete
         r = self.client.delete('api/album/'+str(self.album.id),

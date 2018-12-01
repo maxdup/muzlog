@@ -1,6 +1,5 @@
 from flask import Flask
-from flask_restful import Api
-from flask_restplus import Api as RestApi
+from flask_restplus import Api
 from flask_mongoengine import MongoEngine
 from flask_security import Security, MongoEngineUserDatastore, \
     auth_token_required
@@ -34,8 +33,7 @@ def create_app(config):
     mail = Mail(app)
     db.init_app(app)
 
-    api = Api(app)
-    restApi = RestApi(app, doc='/doc/')
+    api = RestApi(app, doc='/doc/')
 
     api.add_resource(Album_res, "/api/album", endpoint="albums")
     api.add_resource(Album_res, "/api/album/<string:_id>", endpoint="album")
@@ -43,7 +41,7 @@ def create_app(config):
     api.add_resource(Log_res, "/api/log/<string:_id>", endpoint="log")
     api.add_resource(User_res, "/api/profile", endpoint="profiles")
     api.add_resource(User_res, "/api/profile/<string:_id>", endpoint="profile")
-    restApi.add_resource(Role_res, "/api/role", endpoint="roles")
+    api.add_resource(Role_res, "/api/role", endpoint="roles")
 
     CORS(app)
     return app

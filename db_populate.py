@@ -64,6 +64,21 @@ def populate_fake():
             album.save()
 
 
-reset_db()
-populate_init()
+def reset_passwords():
+
+    from muzapi import create_app
+    app = create_app('config')
+
+    with app.app_context():
+
+        users = User.objects()
+        for u in users:
+            u.password = hash_password('changeme')
+            u.save()
+    return
+
+
+# reset_db()
+# populate_init()
 # populate_fake()
+reset_passwords()

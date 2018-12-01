@@ -1,12 +1,13 @@
 from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort
+from flask_restplus import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util import DictDiffer, parse_request, fieldsDateOnly
+from muzapi.util import DictDiffer
+from muzapi.util_rest import parse_request
 from muzapi.models import *
 from muzapi.res_user import User_res
 
@@ -27,7 +28,7 @@ class Log_res(Resource):
         'author': fields.Nested(User_res.user_fields),
         'message': fields.String,
         'published': fields.Boolean,
-        'published_date': fieldsDateOnly,
+        'published_date': fields.String,
 
         'recommended': fields.Boolean,
         'comments': fields.List(fields.Nested(comment_fields)),
@@ -39,6 +40,7 @@ class Log_res(Resource):
     logs_render = {
         'logs': fields.List(fields.Nested(log_fields))
     }
+
     album_summary = {
         'id': fields.String,
         'artist': fields.String,

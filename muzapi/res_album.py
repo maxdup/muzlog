@@ -1,5 +1,5 @@
-from flask import current_app as app, request
-from flask_restful import Resource, fields, marshal, marshal_with, abort, reqparse
+from flask import current_app as app
+from flask_restplus import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
@@ -7,7 +7,8 @@ from mongoengine.errors import ValidationError
 from datetime import datetime
 import re
 
-from muzapi.util import DictDiffer, fieldsDateOnly, parse_request
+from muzapi.util import DictDiffer
+from muzapi.util_rest import *
 from muzapi.util_brainz import *
 from muzapi.models import *
 from muzapi.res_log import Log_res
@@ -21,12 +22,12 @@ class Album_res(Resource):
         'title': fields.String,
         'artist': fields.String,
         'release_type': fields.String,
-        'release_date': fieldsDateOnly,
+        'release_date': fields.String,
         'release_year': fields.String(attribute=lambda x: x.release_date.year
                                       if x.release_date else ''),
         'published': fields.Boolean(attribute=lambda x: True
                                     if x.published_by else False),
-        'published_date': fieldsDateOnly,
+        'published_date': fields.String,
         'published_by_username': fields.String(
             attribute=lambda x: x.published_by.author.username
             if x.published_by else ''),
@@ -70,15 +71,14 @@ class Album_res(Resource):
                 album = Album.objects.get(id=_id)
             except (DoesNotExist, ValidationError):
                 abort(404)
-            return marshal({'album': album}, self.album_render)
+            return marshal(album, self.album_fields, envelope='album')
         else:
-            albums = Album.objects(deleted=False).order_by(
-                '-published_date')
+            albums = Album.objects(deleted=False).order_by('-published_date')
             return marshal({'albums': albums}, self.albums_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(album_render)
+    @marshal_with(album_fields, envelope="album")
     def post(self, _id=None):
         '''
         Create an Album
@@ -91,55 +91,56 @@ class Album_res(Resource):
             'release_type': {}, 'release_date': {}, 'label': {}, 'mbrgid': {}
         }
 
-        content = parse_request(request, post_args)
+        content = parse_request(post_args)
 
         if 'mbrgid' in content:
             album = album_from_mb_release_group(content['mbrgid'])
-            if album:
+            if album.deleted:
                 album.deleted = False
-                album.save()
-                return {'album': album}
-        try:
+        else:
             album = Album(**content)
+
+        try:
             album.save()
             album.reload()
-        except:
+        except ValidationError:
             abort(406)
 
-        return {'album': album}
+        return album
 
     @login_required
     @roles_accepted('admin', 'logger')
+    @marshal_with(album_fields, envelope="album")
     def put(self, _id=None):
 
         # Update an Album
-
         put_args = {
             'id': {'required': True, 'help': "Album id is required"},
             'title': {}, 'artist': {}, 'country': {}, 'country_code': {},
             'release_type': {}, 'release_date': {}, 'label': {}, 'mbrgid': {}
         }
 
-        content = parse_request(request, put_args)
-
+        content = parse_request(put_args)
         try:
             album = Album.objects.get(id=content['id'])
         except (DoesNotExist, ValidationError):
             abort(404)
 
         delta = DictDiffer(content, album.to_mongo()).changed()
+        added = DictDiffer(content, album.to_mongo()).added()
 
         album.modify(**content)
 
         if 'release_date' in delta and content['release_date']:
             album.release_year = album.release_date.year
 
-        if 'mbrgid' in delta and content['mbrgid']:
+        if ('mbrgid' in delta or 'mbrgid' in added) and content['mbrgid']:
             album = album_from_mb_release_group(content['mbrgid'], album)
 
         album.save()
+        album.reload()
 
-        return marshal({'album': album}, self.album_render)
+        return album
 
     @login_required
     @roles_accepted('admin', 'logger')
@@ -154,8 +155,8 @@ class Album_res(Resource):
         except (DoesNotExist, ValidationError):
             abort(404)
 
-        if album.logs:
-            return (400)
+        if len(album.logs) > 0:
+            abort(400)
 
         album.deleted = True
         album.save()

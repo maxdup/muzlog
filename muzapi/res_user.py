@@ -1,12 +1,11 @@
-from flask import request, jsonify
-from flask_restful import Resource, fields, marshal, marshal_with, abort
+from flask_restplus import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util import stringRestricted, listRestricted, parse_request
+from muzapi.util_rest import *
 from muzapi.models import *
 
 
@@ -25,9 +24,6 @@ class User_res(Resource):
 
         'roles': listRestricted(fields.String()),
     }
-    user_render = {
-        'profile': fields.Nested(user_fields)
-    }
     users_render = {
         'profiles': fields.List(fields.Nested(user_fields))
     }
@@ -39,13 +35,13 @@ class User_res(Resource):
         :param_id: The _id of an User object
         '''
         if _id == 'me':
-            return marshal({'profile': current_user}, self.user_render)
+            return marshal(current_user, self.user_fields, envelope='profile')
         elif _id:
             try:
                 user = User.objects.get(id=_id)
             except (DoesNotExist, ValidationError):
                 abort(404)
-            return marshal({'profile': user}, self.user_render)
+            return marshal(user, self.user_fields, envelope='profile')
         elif current_user.has_role('admin'):
             users = User.objects()
         else:
@@ -56,13 +52,14 @@ class User_res(Resource):
 
     @login_required
     @roles_accepted('admin', 'logger')
+    @marshal_with(user_fields, envelope='profile')
     def put(self, _id=None):
 
         # Update User
 
         args = {'id': {'required': True, 'help': 'User id is required'},
                 'bio': {}, 'color': {}, 'username': {}}
-        content = parse_request(request, args)
+        content = parse_request(args)
 
         if content['id'] == str(current_user.id):
             user = current_user
@@ -79,4 +76,4 @@ class User_res(Resource):
         except ValidationError:
             abort(406)
 
-        return marshal({'profile': user}, self.user_render)
+        return user
