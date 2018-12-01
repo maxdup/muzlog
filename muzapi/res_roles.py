@@ -25,9 +25,6 @@ class Role_res(Resource):
 
         'roles': fields.List(fields.String()),
     }
-    user_render = {
-        'profile': fields.Nested(user_fields)
-    }
     roles_fields = {
         'roles': fields.List(fields.String()),
     }
@@ -39,14 +36,12 @@ class Role_res(Resource):
     @roles_accepted('admin')
     @marshal_with(roles_fields)
     def get(self):
-
         # Get All Roles
-
-        return marshal({'roles': Role.objects()}, self.roles_fields)
+        return {'roles': Role.objects()}
 
     @login_required
     @roles_accepted('admin')
-    @marshal_with(user_render)
+    @marshal_with(user_fields, envelope="profile")
     def post(self):
 
         # Add a role
@@ -62,11 +57,11 @@ class Role_res(Resource):
             user.roles.append(role)
             user.save()
 
-        return {'profile': user}
+        return user
 
     @login_required
     @roles_accepted('admin')
-    @marshal_with(user_render)
+    @marshal_with(user_fields, envelope="profile")
     def put(self):
 
         # Revoke a role
@@ -86,4 +81,4 @@ class Role_res(Resource):
             user.roles = [x for x in user.roles if x.id != role.id]
             user.save()
 
-        return {'profile': user}
+        return user
