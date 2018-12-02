@@ -33,15 +33,12 @@ def create_app(config):
     mail = Mail(app)
     db.init_app(app)
 
-    api = Api(app, doc='/doc/')
+    api = Api(app, doc='/doc/', prefix='/api/')
 
-    api.add_resource(Album_res, "/api/album", endpoint="albums")
-    api.add_resource(Album_res, "/api/album/<string:_id>", endpoint="album")
-    api.add_resource(Log_res, "/api/log", endpoint="logs")
-    api.add_resource(Log_res, "/api/log/<string:_id>", endpoint="log")
-    api.add_resource(User_res, "/api/profile", endpoint="profiles")
-    api.add_resource(User_res, "/api/profile/<string:_id>", endpoint="profile")
-    api.add_resource(Role_res, "/api/role", endpoint="roles")
+    api.add_resource(Log_res, "log", "log/<string:_id>")
+    api.add_resource(Role_res, "role")
+    api.add_resource(User_res, "profile", "profile/<string:_id>")
+    api.add_resource(Album_res, "album", "album/<string:_id>")
 
     CORS(app)
     return app

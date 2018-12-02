@@ -18,7 +18,7 @@ class Log_res(Resource):
         'id': fields.String,
         'author': fields.Nested(User_res.user_fields),
         'message': fields.String,
-        'creation_time': fields.DateTime(dt_format='iso8601'),
+        'published_date': fields.DateTime(dt_format='iso8601'),
 
         'username': db.StringField(),
     }
@@ -34,13 +34,6 @@ class Log_res(Resource):
         'comments': fields.List(fields.Nested(comment_fields)),
     }
 
-    log_render = {
-        'log': fields.Nested(log_fields)
-    }
-    logs_render = {
-        'logs': fields.List(fields.Nested(log_fields))
-    }
-
     album_summary = {
         'id': fields.String,
         'artist': fields.String,
@@ -53,9 +46,7 @@ class Log_res(Resource):
         'album': fields.Nested(album_summary)
     }
     log_album_fields.update(log_fields)
-    log_album_render = {
-        'log': fields.Nested(log_album_fields)
-    }
+
     logs_album_render = {
         'logs': fields.List(fields.Nested(log_album_fields))
     }
@@ -66,19 +57,24 @@ class Log_res(Resource):
 
         :param_id: The _id of a Log object to get
         '''
-        if (_id):
+        if _id == 'me':
+            if not current_user.has_role('logger') and \
+               not current_user.has_role('admin'):
+                abort(403)
+            logs = Log.objects(author=current_user.id).order_by(
+                '-published_date')
+            return marshal({'logs': logs}, self.logs_album_render)
+        else:
             try:
-                log = Log.objects(id=_id)
+                log = Log.objects.get(id=_id)
             except (DoesNotExist, ValidationError):
                 abort(404)
-            return marshal({'log': log[0]}, self.log_render)
-        else:
-            logs = Log.objects(author=current_user.id)
-            return marshal({'logs': logs}, self.logs_album_render)
+            return marshal(log, self.log_fields, envelope="log")
 
     @login_required
     @roles_accepted('admin', 'logger')
-    def post(self):
+    @marshal_with(log_album_fields, envelope="log")
+    def post(self, id=None):
 
         # Create an album log
 
@@ -93,11 +89,8 @@ class Log_res(Resource):
         try:
             content['album'] = Album.objects.get(id=content['album'])
             content['author'] = current_user.id
-
         except (DoesNotExist, ValidationError):
             abort(404)
-        except:
-            abort(406)
 
         log = Log(**content)
         log.save()
@@ -113,10 +106,11 @@ class Log_res(Resource):
         log.album.logs.append(log)
         log.album.save()
 
-        return marshal({'log': log}, self.log_album_render)
+        return log
 
     @login_required
     @roles_accepted('admin', 'logger')
+    @marshal_with(log_album_fields, envelope="log")
     def put(self, _id=None):
         '''
         Update an album log
@@ -176,7 +170,7 @@ class Log_res(Resource):
                         break
 
         log.album.save()
-        return marshal({'log': log}, self.log_album_render)
+        return log
 
     @login_required
     @roles_accepted('admin', 'logger')
@@ -191,6 +185,10 @@ class Log_res(Resource):
         except (DoesNotExist, ValidationError):
             abort(404)
 
+        if not current_user.has_role('admin') and \
+           str(log.author.id) != str(current_user.id):
+            abort(403)
+
         if log.published:
             abort(400)
 
@@ -199,4 +197,4 @@ class Log_res(Resource):
         log.album.save()
         log.delete()
 
-        return (204)
+        return ('', 204)

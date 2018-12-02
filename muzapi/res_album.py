@@ -160,4 +160,4 @@ class Album_res(Resource):
 
         album.deleted = True
         album.save()
-        return (200)
+        return ('', 204)

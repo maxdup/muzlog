@@ -176,7 +176,7 @@ class AlbumsTestCase(unittest.TestCase):
                                content_type='application/json')
         album = Album.objects.get(id=deleted_id)
         self.assertTrue(album.deleted)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, 204)
         r = self.client.post('api/album', content_type='application/json',
                              data=json.dumps({'mbrgid': 'f32fab67-77dd-3937-addc-9062e28e4c37'}))
         self.assertEqual(r.status_code, 200)
@@ -289,7 +289,7 @@ class AlbumsTestCase(unittest.TestCase):
         # Test complete delete
         r = self.client.delete('api/album/'+str(self.album.id),
                                content_type='application/json')
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, 204)
 
         # Assert db
         album = Album.objects.get(id=self.album.id)

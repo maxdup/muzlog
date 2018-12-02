@@ -12,9 +12,6 @@ class Role(db.Document, RoleMixin):
     def __str__(self):
         return self.name
 
-    def __repr__(self):
-        return '<Role %r>' % self.name
-
 
 class User(db.Document, UserMixin):
     email = db.EmailField(max_length=255, nullable=False, unique=True)
@@ -101,6 +98,4 @@ class Comment(db.EmbeddedDocument):
 class Log(Message):
     album = db.ReferenceField(Album, required=True, nullable=False)
     recommended = db.BooleanField(default=False)
-    recommended_by = db.ReferenceField(Album, nullable=True)
-
     comments = db.ListField(db.EmbeddedDocumentField(Comment, default=Comment))
