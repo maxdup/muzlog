@@ -36,9 +36,6 @@ class User(db.Document, UserMixin):
 
     roles = db.ListField(db.ReferenceField(Role), default=[])
 
-    def __repr__(self):
-        return '<User %r>' % self.id
-
 
 class Message(db.Document):
     author = db.ReferenceField(User, nullable=False)
@@ -76,10 +73,6 @@ class Album(db.Document):
 
     cover = db.StringField()
     thumb = db.StringField()
-
-    recommended_by = db.ReferenceField(User, nullable=True)
-    published_by = db.ReferenceField(Message)
-    published_date = db.DateField()
 
     logs = db.ListField(db.ReferenceField(Message))
 

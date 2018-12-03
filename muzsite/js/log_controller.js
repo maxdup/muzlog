@@ -22,7 +22,7 @@ module.exports = angular.module('muz.logCtrl', [])
     '$stateParams', '$scope', 'Log', '$http',
     function($stateParams, $scope, Log, $http) {
 
-      Log.get().$promise.then(function(value){
+      Log.me().$promise.then(function(value){
         $scope.logs = value.logs;
       });
     }]);

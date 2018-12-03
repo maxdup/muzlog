@@ -82,19 +82,12 @@ class Album_res(Resource):
         except (DoesNotExist, ValidationError):
             abort(404)
 
-        delta = DictDiffer(content, album.to_mongo()).changed()
-        added = DictDiffer(content, album.to_mongo()).added()
-
-        album.modify(**content)
-
-        if 'release_date' in delta and content['release_date']:
-            album.release_year = album.release_date.year
-
-        if ('mbrgid' in delta or 'mbrgid' in added) and content['mbrgid']:
+        if 'mbrgid' and content['mbrgid'] and content['mbrgid'] != album.mbrgid:
             album = album_from_mb_release_group(content['mbrgid'], album)
-
-        album.save()
-        album.reload()
+            album.save()
+            album.reload()
+        else:
+            album.modify(**content)
 
         return album
 

@@ -5,20 +5,20 @@
   {% from "_macros.html" import render_field_with_errors, render_field %}
   <div class="container">
     <div class="row">
-      {% for album in albums %}
-      <a class="col s6 m4 xl2" href="/album/{{album.id}}">
+      {% for log in logs %}
+      <a class="col s6 m4 xl2" href="/album/{{log.album.id}}">
         <div class="album-preview" >
-          {% if album.thumb %}
+          {% if log.album.thumb %}
           {% if config.DEBUG %}
-          <img class="cover" src="http://127.0.0.1/muzlogcovers/{{album.thumb}}"/>
+          <img class="cover" src="http://127.0.0.1/muzlogcovers/{{log.album.thumb}}"/>
           {% else %}
-          <img class="cover" src="/muzlogcovers/{{album.thumb}}"/>
+          <img class="cover" src="/muzlogcovers/{{log.album.thumb}}"/>
           {% endif %}
           {% else %}
           <img class="cover placeholder" src="/static/images/placeholder_album.jpg"/>
           {% endif %}
           <div class="title">
-            <span>{{ album.title }}</span></br> {{ album.artist }}
+            <span>{{ log.album.title }}</span></br> {{ log.album.artist }}
           </div>
         </div>
       </a>

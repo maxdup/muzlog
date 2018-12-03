@@ -1,15 +1,15 @@
 from flask import Blueprint, render_template, session
 from flask_security import roles_accepted, login_required
 
-from muzapi.models import Album
+from muzapi.models import Album, Log
+
 muzlog_site = Blueprint('muzlog_site', __name__)
 
 
 @muzlog_site.route('/', methods=['GET'])
 def home():
-    albums = Album.objects(
-        deleted=False, published_by__exists=True).order_by('-published_date')
-    return render_template('/index.html', albums=albums)
+    logs = Log.objects(published=True).order_by('-published_date')
+    return render_template('/index.html', logs=logs)
 
 
 @muzlog_site.route('/album/<_id>', methods=['GET'])

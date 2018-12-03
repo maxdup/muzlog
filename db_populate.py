@@ -81,4 +81,20 @@ def reset_passwords():
 # reset_db()
 # populate_init()
 # populate_fake()
-reset_passwords()
+# reset_passwords()
+def remove_album_published():
+    from muzapi import create_app
+    app = create_app('config')
+
+    from muzapi.models import Album
+
+    with app.app_context():
+        albums = Album.objects()
+        for album in albums:
+            album.update(unset__published_date=True)
+            album.update(unset__published_by=True)
+            album.update(unset__recommended_by=True)
+            album.save()
+
+
+remove_album_published()

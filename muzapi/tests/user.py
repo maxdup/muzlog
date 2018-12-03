@@ -144,6 +144,11 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(data['profile']['bio'], 'im not you')
         self.assertEqual(data['profile']['color'], '#555555')
 
+        user = User.objects.get(id=self.u_1.id)
+        self.assertEqual(str(user.id), str(self.u_1.id))
+        self.assertEqual(user.bio, 'im not you')
+        self.assertEqual(user.color, '#555555')
+
         # test by bad id
         r = self.client.put('api/profile',
                             content_type='application/json',

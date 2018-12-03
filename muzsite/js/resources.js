@@ -8,7 +8,9 @@ module.exports = angular.module('muz.resources',['ngResource', 'ngFileUpload'])
   }])
   .factory('Log', ["$resource", function($resource) {
     return $resource( '/api/log/:id', {id: '@id'},
-                      {'update':{ method:'PUT'}});
+                      {'update':{ method:'PUT'},
+                       'me': { method:'GET',
+                               url:'/api/log/me'}});
   }])
   .factory('Profile', ["$resource", "ProfileInterceptor", function($resource, interceptor) {
     return $resource( '/api/profile/:id', {id: '@id'},
@@ -33,25 +35,25 @@ module.exports = angular.module('muz.resources',['ngResource', 'ngFileUpload'])
   }])
 
   .factory('ProfileInterceptor', ["$rootScope", function($rootScope) {
-  return {
-    response: function(response){
+    return {
+      response: function(response){
 
-      if (response.config.method == 'PUT' ||
-          response.config.method == 'POST'){
-        if (response.status == 200 && response.data.profile &&
-            response.data.profile.id == $rootScope.profile.id){
-          $rootScope.profile = response.data.profile;
-        }
-      }
-      if (response.config.method == 'GET'){
-        if (response.status == 200 && response.data.profile){
-          if (response.config.url == '/api/profile/me' ||
+        if (response.config.method == 'PUT' ||
+            response.config.method == 'POST'){
+          if (response.status == 200 && response.data.profile &&
               response.data.profile.id == $rootScope.profile.id){
-            $rootScope.profile = _.cloneDeep(response.data.profile);
+            $rootScope.profile = response.data.profile;
           }
         }
+        if (response.config.method == 'GET'){
+          if (response.status == 200 && response.data.profile){
+            if (response.config.url == '/api/profile/me' ||
+                response.data.profile.id == $rootScope.profile.id){
+              $rootScope.profile = _.cloneDeep(response.data.profile);
+            }
+          }
+        }
+        return response.data;
       }
-      return response.data;
     }
-  }
-}])
+  }])
