@@ -2,9 +2,9 @@ from flask_restplus import Resource, fields, marshal, marshal_with, abort
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
-from muzapi.util_rest import *
+from muzapi.util_rest import parse_request
 from muzapi.models import User, Role
-from muzapi.res_user import User_res
+from muzapi.render import user_fields
 
 
 class Role_res(Resource):
@@ -14,14 +14,14 @@ class Role_res(Resource):
 
     @login_required
     @roles_accepted('admin')
-    @marshal_with(User_res.user_fields, skip_none=True)
+    @marshal_with(user_fields, skip_none=True)
     def get(self):
         # Get All Roles
         return {'roles': Role.objects()}
 
     @login_required
     @roles_accepted('admin')
-    @marshal_with(User_res.user_fields, envelope="profile")
+    @marshal_with(user_fields, envelope="profile")
     def post(self):
 
         # Add a role
@@ -41,7 +41,7 @@ class Role_res(Resource):
 
     @login_required
     @roles_accepted('admin')
-    @marshal_with(User_res.user_fields, envelope="profile")
+    @marshal_with(user_fields, envelope="profile")
     def put(self):
 
         # Revoke a role

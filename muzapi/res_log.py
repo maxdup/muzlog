@@ -9,47 +9,10 @@ from datetime import datetime
 from muzapi.util import DictDiffer
 from muzapi.util_rest import parse_request
 from muzapi.models import *
-from muzapi.res_user import User_res
+from muzapi.render import *
 
 
 class Log_res(Resource):
-
-    comment_fields = {
-        'id': fields.String,
-        'author': fields.Nested(User_res.user_fields),
-        'message': fields.String,
-        'published_date': fields.DateTime(dt_format='iso8601'),
-
-        'username': db.StringField(),
-    }
-
-    log_fields = {
-        'id': fields.String,
-        'author': fields.Nested(User_res.user_fields),
-        'message': fields.String,
-        'published': fields.Boolean,
-        'published_date': fields.String,
-
-        'recommended': fields.Boolean,
-        'comments': fields.List(fields.Nested(comment_fields)),
-    }
-
-    album_summary = {
-        'id': fields.String,
-        'artist': fields.String,
-        'title': fields.String,
-        'release_year': fields.Integer,
-        'cover': fields.String,
-        'thumb': fields.String,
-    }
-    log_album_fields = {
-        'album': fields.Nested(album_summary)
-    }
-    log_album_fields.update(log_fields)
-
-    logs_album_render = {
-        'logs': fields.List(fields.Nested(log_album_fields))
-    }
 
     def get(self, _id=None):
         '''
@@ -62,18 +25,21 @@ class Log_res(Resource):
                not current_user.has_role('admin'):
                 abort(403)
             logs = Log.objects(author=current_user.id).order_by(
-                '-published_date')
-            return marshal({'logs': logs}, self.logs_album_render)
-        else:
+                'published', '-published_date')
+            return marshal({'logs': logs}, logs_album_render)
+        elif _id:
             try:
                 log = Log.objects.get(id=_id)
+                return marshal(log, log_album_render, envelope="log")
             except (DoesNotExist, ValidationError):
                 abort(404)
-            return marshal(log, self.log_fields, envelope="log")
+        else:
+            logs = Log.objects(published=True).order_by('-published_date')
+            return marshal({'logs': logs}, logs_album_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(log_album_fields, envelope="log")
+    @marshal_with(log_album_render, envelope="log")
     def post(self, id=None):
 
         # Create an album log
@@ -96,21 +62,11 @@ class Log_res(Resource):
         log.save()
         log.reload()
 
-        if log.published and not log.album.published_by:
-            log.album.published_by = log
-            log.album.published_date = log.published_date
-
-        if log.recommended and not log.album.recommended_by:
-            log.album.recommended_by = log.author
-
-        log.album.logs.append(log)
-        log.album.save()
-
         return log
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(log_album_fields, envelope="log")
+    @marshal_with(log_album_render, envelope="log")
     def put(self, _id=None):
         '''
         Update an album log
@@ -134,42 +90,10 @@ class Log_res(Resource):
             if log.author.id != current_user.id:
                 abort(403)
 
-        delta = DictDiffer(content, log.to_mongo()).changed()
-
         log.modify(**content)
         log.save()
         log.reload()
 
-        if 'published' in delta:
-            if log.published:
-                if not log.album.published_by or \
-                   log.album.published_by == log:
-                    log.album.published_by = log
-                    log.album.published_date = log.published_date
-            elif log.album.published_by == log:
-                log.album.published_by = None
-                log.album.published_date = None
-                for l in log.album.logs:
-                    if l.published:
-                        log.album.published_by = l
-                        log.album.published_date = l.published_date
-                        break
-
-        if 'published_date' in delta and log.album.published_by == log:
-            log.album.published_date = log.published_date
-
-        if 'recommended' in delta:
-            if log.recommended:
-                if not log.album.recommended_by:
-                    log.album.recommended_by = log.author
-            elif log.album.recommended_by == log:
-                log.album.recommended_by = None
-                for l in log.album.logs:
-                    if l.recommended:
-                        log.album.recommended_by = l.author
-                        break
-
-        log.album.save()
         return log
 
     @login_required

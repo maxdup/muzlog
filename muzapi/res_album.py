@@ -8,57 +8,13 @@ from datetime import datetime
 import re
 
 from muzapi.util import DictDiffer
-from muzapi.util_rest import *
 from muzapi.util_brainz import *
+from muzapi.util_rest import parse_request
 from muzapi.models import *
-from muzapi.res_log import Log_res
-from muzapi.res_user import User_res
+from muzapi.render import *
 
 
 class Album_res(Resource):
-
-    album_fields_base = {
-        'id': fields.String,
-        'title': fields.String,
-        'artist': fields.String,
-        'release_type': fields.String,
-        'release_date': fields.String,
-        'release_year': fields.String(attribute=lambda x: x.release_date.year
-                                      if x.release_date else ''),
-        'published': fields.Boolean(attribute=lambda x: True
-                                    if x.published_by else False),
-        'published_date': fields.String,
-        'published_by_username': fields.String(
-            attribute=lambda x: x.published_by.author.username
-            if x.published_by else ''),
-        'recommended_by_username': fields.String(
-            attribute=lambda x: x.recommended_by.username
-            if x.recommended_by else None),
-        'recommended_by_color': fields.String(
-            attribute=lambda x: x.recommended_by.color
-            if x.recommended_by else None),
-        'cover': fields.String,
-        'thumb': fields.String,
-    }
-
-    album_fields = {
-        'mbrgid': fields.String,
-        'mbaid': fields.String,
-        'label': fields.String,
-        'country': fields.String,
-        'country_code': fields.String,
-        'logs': fields.List(fields.Nested(Log_res.log_fields)),
-        'published_by': fields.Nested(Log_res.log_fields),
-        'recommended_by': fields.Nested(User_res.user_fields),
-    }
-    album_fields.update(album_fields_base)
-
-    album_render = {
-        'album': fields.Nested(album_fields)
-    }
-    albums_render = {
-        'albums': fields.List(fields.Nested(album_fields_base))
-    }
 
     def get(self, _id=None):
         '''
@@ -71,10 +27,10 @@ class Album_res(Resource):
                 album = Album.objects.get(id=_id)
             except (DoesNotExist, ValidationError):
                 abort(404)
-            return marshal(album, self.album_fields, envelope='album')
+            return marshal(album, album_fields, envelope='album')
         else:
-            albums = Album.objects(deleted=False).order_by('-published_date')
-            return marshal({'albums': albums}, self.albums_render)
+            albums = Album.objects(deleted=False)
+            return marshal({'albums': albums}, albums_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
@@ -158,6 +114,5 @@ class Album_res(Resource):
         if len(album.logs) > 0:
             abort(400)
 
-        album.deleted = True
-        album.save()
+        album.modify(**{'deleted': True})
         return ('', 204)

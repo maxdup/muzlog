@@ -5,28 +5,13 @@ from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util_rest import *
+
+from muzapi.util_rest import parse_request
 from muzapi.models import *
+from muzapi.render import *
 
 
 class User_res(Resource):
-
-    user_fields = {
-        'id': fields.String,
-        'email': stringRestricted,
-
-        'bio': fields.String,
-        'username': fields.String,
-        'color': fields.String,
-
-        'avatar': fields.String,
-        'thumb': fields.String,
-
-        'roles': listRestricted(fields.String()),
-    }
-    users_render = {
-        'profiles': fields.List(fields.Nested(user_fields))
-    }
 
     def get(self, _id=None):
         '''
@@ -35,20 +20,20 @@ class User_res(Resource):
         :param_id: The _id of an User object
         '''
         if _id == 'me':
-            return marshal(current_user, self.user_fields, envelope='profile')
+            return marshal(current_user, user_fields, envelope='profile')
         elif _id:
             try:
                 user = User.objects.get(id=_id)
             except (DoesNotExist, ValidationError):
                 abort(404)
-            return marshal(user, self.user_fields, envelope='profile')
+            return marshal(user, user_fields, envelope='profile')
         elif current_user.has_role('admin'):
             users = User.objects()
         else:
             log_role = Role.objects.get(name="logger")
             users = User.objects.filter(roles__contains=log_role)
 
-        return marshal({'profiles': users}, self.users_render)
+        return marshal({'profiles': users}, users_render)
 
     @login_required
     @roles_accepted('admin', 'logger')
@@ -72,7 +57,6 @@ class User_res(Resource):
             abort(403)
         try:
             user.modify(**content)
-            user.save()
         except ValidationError:
             abort(406)
 
