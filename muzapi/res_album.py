@@ -7,7 +7,6 @@ from mongoengine.errors import ValidationError
 from datetime import datetime
 import re
 
-from muzapi.util import DictDiffer
 from muzapi.util_brainz import *
 from muzapi.util_rest import parse_request
 from muzapi.models import *
@@ -82,7 +81,7 @@ class Album_res(Resource):
         except (DoesNotExist, ValidationError):
             abort(404)
 
-        if 'mbrgid' and content['mbrgid'] and content['mbrgid'] != album.mbrgid:
+        if 'mbrgid' in content and content['mbrgid'] and content['mbrgid'] != album.mbrgid:
             album = album_from_mb_release_group(content['mbrgid'], album)
             album.save()
             album.reload()

@@ -2,6 +2,8 @@ import os
 import unittest
 import tempfile
 
+from muzapi.tests.routes import *
+from muzapi.tests.fake import *
 from muzapi.tests.user import *
 from muzapi.tests.roles import *
 from muzapi.tests.albums import *

@@ -5,10 +5,10 @@ import requests
 import json
 
 from muzapi.models import *
-from muzapi.util import ensure_roles
+from muzapi.res_roles import ensure_roles
 from muzapi import create_app
 
-from muzapi.util_fakedata import fake_user, fake_album, fake_log, fake_comment
+from muzapi.util_fakedata import fake_user, fake_album, fake_log
 
 from datetime import datetime
 

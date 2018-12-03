@@ -5,7 +5,7 @@ import requests
 import json
 
 from muzapi.models import User, Role
-from muzapi.util import ensure_roles
+from muzapi.res_roles import ensure_roles
 from muzapi import create_app
 
 from muzapi.util_fakedata import fake_user

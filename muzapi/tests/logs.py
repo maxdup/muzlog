@@ -5,10 +5,10 @@ import requests
 import json
 
 from muzapi.models import *
-from muzapi.util import ensure_roles
+from muzapi.res_roles import ensure_roles
 from muzapi import create_app
 
-from muzapi.util_fakedata import fake_user, fake_album, fake_log, fake_comment
+from muzapi.util_fakedata import fake_user, fake_album, fake_log
 
 from datetime import datetime
 
@@ -84,7 +84,7 @@ class LogsTestCase(unittest.TestCase):
                             headers={'content-type': 'application/json'})
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())
-        self.assertEqual(len(data['logs']), 3)
+        self.assertEqual(len(data['logs']), 2)
 
         # test /log/me 403
         r = self.client.get('api/log/me',

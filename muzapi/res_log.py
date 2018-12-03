@@ -6,7 +6,6 @@ from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util import DictDiffer
 from muzapi.util_rest import parse_request
 from muzapi.models import *
 from muzapi.render import *

@@ -30,8 +30,3 @@ def fake_album():
                   release_date=release_date)
 
     return album
-
-
-def fake_comment(author=None):
-    # todo
-    return None
