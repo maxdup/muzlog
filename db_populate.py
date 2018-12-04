@@ -2,7 +2,7 @@ from flask_security.utils import hash_password
 
 from muzapi import create_app, db
 from muzapi.models import Role, User
-from muzapi.util_fakedata import fake_user, fake_album, fake_log, fake_comment
+from muzapi.util_fakedata import fake_user, fake_album, fake_log
 
 
 def reset_db():

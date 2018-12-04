@@ -15,4 +15,5 @@ def home():
 @muzlog_site.route('/album/<_id>', methods=['GET'])
 def album(_id):
     album = Album.objects.get(id=_id)
+    Log.objects(album=album, published=True).update(inc__hits=1)
     return render_template('/album.html', album=album)

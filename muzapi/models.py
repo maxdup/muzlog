@@ -90,5 +90,6 @@ class Comment(db.EmbeddedDocument):
 
 class Log(Message):
     album = db.ReferenceField(Album, required=True, nullable=False)
+    hits = db.IntField(default=0)
     recommended = db.BooleanField(default=False)
     comments = db.ListField(db.EmbeddedDocumentField(Comment, default=Comment))

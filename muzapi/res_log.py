@@ -60,6 +60,8 @@ class Log_res(Resource):
         log = Log(**content)
         log.save()
         log.reload()
+        log.album.logs.append(log)
+        log.album.save()
 
         return log
 
