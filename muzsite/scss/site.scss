@@ -7,14 +7,55 @@ body {
     position: relative;
     margin-top: 1.50rem;
     box-shadow: 0px 4px 17px -2px #6d6d6d;
-    >img {
+    >.thumbnail-container {
+        &.recommended {
+            background: black;
+
+            .text-recommend {
+                position: absolute;
+                color: white;
+                height: 15%;
+                width: 100%;
+                top: 0;
+                font-size: 1rem;
+                font-weight: 500;
+                &:before {
+                    content: '';
+                    display: inline-block;
+                    height: 100%;
+                    vertical-align: middle;
+                    width: 5%;
+                }
+                span {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+            }
+            img {
+                width: 85%;
+                left: 7.5%;
+                top: 15%;
+            }
+        }
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            -webkit-transition: all .2s ease-out;
+            -moz-transition: all .2s ease-out;
+            -o-transition: all .2s ease-out;
+            transition: all .2s ease-out;
+        }
         position: absolute;
+        width: 100%;
+        height: auto;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        width: 100%;
-        height: auto;
         z-index: 2;
         margin: auto;
         -webkit-transition: all .2s ease-out;
@@ -51,7 +92,7 @@ body {
     }
     &:hover {
         box-shadow: 0px 15px 17px -2px #aaa;
-        >img {
+        >.thumbnail-container {
             top: -5px;
             left: -5px;
             right: -5px;

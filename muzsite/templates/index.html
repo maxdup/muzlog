@@ -7,16 +7,24 @@
     <div class="row">
       {% for log in logs %}
       <a class="col s6 m4 xl2" href="/album/{{log.album.id}}">
-        <div class="album-preview" >
-          {% if log.album.thumb %}
-          {% if config.DEBUG %}
-          <img class="cover" src="http://127.0.0.1/muzlogcovers/{{log.album.thumb}}"/>
-          {% else %}
-          <img class="cover" src="/muzlogcovers/{{log.album.thumb}}"/>
-          {% endif %}
-          {% else %}
-          <img class="cover placeholder" src="/static/images/placeholder_album.jpg"/>
-          {% endif %}
+        <div class="album-preview">
+          <div class="thumbnail-container{% if log.recommended %} recommended{% endif %}"
+               {% if log.recommended %} style="background: {{log.author.color}};" {% endif %}>
+            {% if log.recommended %}
+            <div class="text-recommend">
+              <span>Recommended</span>
+            </div>
+            {% endif %}
+            {% if log.album.thumb %}
+            {% if config.DEBUG %}
+            <img class="cover" src="http://127.0.0.1/muzlogcovers/{{log.album.thumb}}"/>
+            {% else %}
+            <img class="cover" src="/muzlogcovers/{{log.album.thumb}}"/>
+            {% endif %}
+            {% else %}
+            <img class="cover placeholder" src="/static/images/placeholder_album.jpg"/>
+            {% endif %}
+          </div>
           <div class="title">
             <span>{{ log.album.title }}</span></br> {{ log.album.artist }}
           </div>
