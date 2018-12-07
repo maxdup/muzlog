@@ -1,6 +1,7 @@
 body {
     background: bisque;
 }
+
 .album-preview {
     padding-bottom: 100%;
     position: relative;
@@ -189,6 +190,9 @@ body {
                 }
             }
             .cover {
+                max-width: 300px;
+                min-height: 100px;
+                margin:auto;
                 position: relative;
                 .contain {
                     box-shadow: 0px 5px 29px 1px #4d4c4c;
