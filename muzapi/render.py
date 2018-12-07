@@ -49,6 +49,7 @@ log_fields_base = {
     'published_date': fields.String,
     'recommended': fields.Boolean,
     'comments': fields.List(fields.Nested(comment_fields_base)),
+    'hits': fields.Integer,
 }
 
 

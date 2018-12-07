@@ -36,9 +36,11 @@
           <div class="row-like">
             <p>{{log.message}}</p>
           </div>
-          <div class="row">
+          <div class="row apart">
             <span class="col s6">{{log.published_date | date : medium : 'UTC'}}</span>
-            <span class="col s6">{{log.recommended ? 'Recommended': 'Not Recommended'}}</span>
+            <span class="col s6" ng-if="$root.profile.roles.indexOf('admin') != -1">
+              {{log.recommended ? 'Recommended': 'Not Recommended'}} - {{ log.hits }} hits
+            </span>
           </div>
           <div class="btn-controls"
                ng-if=" ($root.profile.roles.indexOf('admin') != -1 ||

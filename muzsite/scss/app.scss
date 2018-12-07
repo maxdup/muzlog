@@ -1,5 +1,13 @@
 .card {
     margin: 1rem 0 1rem 0;
+    .row.apart {
+        .col:last-child {
+            text-align: right;
+        }
+        .col:first-child {
+            text-align: left;
+        }
+    }
 }
 .albums-list {
     img {
