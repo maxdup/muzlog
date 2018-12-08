@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from flask_restplus import Resource, fields, marshal, marshal_with, abort
+from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
@@ -10,7 +10,10 @@ from muzapi.util_rest import parse_request
 from muzapi.models import *
 from muzapi.render import *
 
+log_api = Namespace('log', description="Log resource")
 
+
+@log_api.route('/', '/<string:_id>')
 class Log_res(Resource):
 
     def get(self, _id=None):

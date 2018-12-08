@@ -1,4 +1,4 @@
-from flask_restplus import Resource, fields, marshal, marshal_with, abort
+from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
@@ -6,7 +6,10 @@ from muzapi.util_rest import parse_request
 from muzapi.models import User, Role
 from muzapi.render import user_fields
 
+role_api = Namespace('role', description="Role resource")
 
+
+@role_api.route('/')
 class Role_res(Resource):
 
     args = {'id': {'required': True, 'help': "user id is required"},
