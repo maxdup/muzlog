@@ -190,7 +190,7 @@ class AlbumsTestCase(unittest.TestCase):
             sess['user_id'] = str(self.u_2.id)
             sess['_fresh'] = True
         r = self.client.put('api/album')
-        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.status_code, 405)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_1.id)
@@ -199,17 +199,18 @@ class AlbumsTestCase(unittest.TestCase):
         # Test insufficient put
         r = self.client.put('api/album', content_type='application/json',
                             data=json.dumps({}))
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, 405)
 
         # Test not found put
-        r = self.client.put('api/album', content_type='application/json',
-                            data=json.dumps({'id': '000000000000000000000000'}))
+        r = self.client.put('api/album/000000000000000000000000',
+                            content_type='application/json',
+                            data=json.dumps({}))
         self.assertEqual(r.status_code, 404)
 
         # Test minimal put
-        r = self.client.put('api/album', content_type='application/json',
-                            data=json.dumps({'id': str(self.album.id),
-                                             'artist': 'new artist'}))
+        r = self.client.put('api/album/' + str(self.album.id),
+                            content_type='application/json',
+                            data=json.dumps({'artist': 'new artist'}))
         self.assertEqual(r.status_code, 200)
 
         # assert response
@@ -224,9 +225,9 @@ class AlbumsTestCase(unittest.TestCase):
         self.assertEqual(album.title, self.album.title)
 
         # Test Full put
-        r = self.client.put('api/album', content_type='application/json',
-                            data=json.dumps({'id': str(self.album.id),
-                                             'title': 'nother title',
+        r = self.client.put('api/album/' + str(self.album.id),
+                            content_type='application/json',
+                            data=json.dumps({'title': 'nother title',
                                              'artist': 'newer artist',
                                              'country': 'canada',
                                              'country_code': 'CA',
@@ -256,9 +257,9 @@ class AlbumsTestCase(unittest.TestCase):
         self.assertEqual(album.label, 'label obscura')
 
         # Test mbrgid put
-        r = self.client.put('api/album', content_type='application/json',
-                            data=json.dumps({'id': str(self.album.id),
-                                             'mbrgid': 'f32fab67-77dd-3937-addc-9062e28e4c37'}))
+        r = self.client.put('api/album/' + str(self.album.id),
+                            content_type='application/json',
+                            data=json.dumps({'mbrgid': 'f32fab67-77dd-3937-addc-9062e28e4c37'}))
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())['album']
         self.assertEqual(data['mbrgid'],
@@ -270,16 +271,22 @@ class AlbumsTestCase(unittest.TestCase):
             sess['user_id'] = str(self.u_2.id)
             sess['_fresh'] = True
         r = self.client.put('api/album')
-        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.status_code, 405)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_1.id)
             sess['_fresh'] = True
 
+        # Test delete fictive album
+        r = self.client.delete('api/album/000000000000000000000000',
+                               content_type='application/json',
+                               data=json.dumps({}))
+        self.assertEqual(r.status_code, 404)
+
         # Test insufficient delete
         r = self.client.delete('api/album', content_type='application/json',
                                data=json.dumps({}))
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, 405)
 
         # Test failed delete for logged albums
         r = self.client.delete('api/album/'+str(self.album_logged.id),

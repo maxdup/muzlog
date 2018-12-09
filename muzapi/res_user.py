@@ -9,31 +9,11 @@ from datetime import datetime
 from muzapi.util_rest import RequestParser
 from muzapi.models import User, Role
 from muzapi.util_rest import *
+from muzapi.render import user_render, users_render
 
 
 user_api = Namespace('Profiles', path='/profile',
                      description="User resource")
-
-
-base_user = user_api.model('Base User fields', {
-    'id': fields.String,
-    'email': stringRestricted,
-
-    'bio': fields.String,
-    'username': fields.String,
-    'color': fields.String,
-
-    'avatar': fields.String,
-    'thumb': fields.String,
-
-    'roles': listRestricted(fields.String()),
-})
-user_render = user_api.model('User Resource', {
-    'profile': fields.Nested(base_user)
-})
-users_render = user_api.model('Users Resource', {
-    'profiles': fields.List(fields.Nested(base_user))
-})
 
 parser_args = {'bio': {}, 'color': {}, 'username': {}}
 parser = RequestParser(arguments=parser_args)

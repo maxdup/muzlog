@@ -4,7 +4,7 @@ from mongoengine.queryset import DoesNotExist
 
 from muzapi.util_rest import RequestParser
 from muzapi.models import User, Role
-from muzapi.res_user import base_user, user_render
+from muzapi.render import base_user, user_render
 
 role_api = Namespace('Roles', path='/role',
                      description="Role resource")

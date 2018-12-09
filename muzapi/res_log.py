@@ -8,37 +8,10 @@ from datetime import datetime
 
 from muzapi.util_rest import RequestParser
 from muzapi.models import *
-from muzapi.res_album import base_album
-from muzapi.res_user import base_user
+from muzapi.render import logs_album_render, log_album_render
 
 log_api = Namespace('Logs', path='/log',
                     description="Log resource")
-
-base_comment = log_api.model('Base Comment', {
-    'id': fields.String,
-    'author': fields.Nested(base_user),
-    'message': fields.String,
-    'published_date': fields.String,
-    'username': fields.String,
-})
-base_log = log_api.model('Base Log fields', {
-    'id': fields.String,
-    'author': fields.Nested(base_user),
-    'message': fields.String,
-    'published': fields.Boolean,
-    'published_date': fields.String,
-    'recommended': fields.Boolean,
-    'comments': fields.List(fields.Nested(base_comment)),
-    'hits': fields.Integer,
-})
-base_log_album = log_api.inherit('Base Log Album fields', base_log, {
-    'album': fields.Nested(base_album)})
-
-log_album_render = log_api.model('Log Resource', {
-    'log': fields.Nested(base_log_album)})
-
-logs_album_render = log_api.model('Logs Resource', {
-    'logs': fields.List(fields.Nested(base_log_album))})
 
 post_args = {
     'album': {'required': True, 'help': "album is required"},

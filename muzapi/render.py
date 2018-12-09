@@ -1,8 +1,9 @@
-from flask_restplus import fields
+from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
 from muzapi.util_rest import *
 
+render_api = Namespace('Models', description="resoruce renders")
 
-user_fields = {
+base_user = render_api.model('Base User fields', {
     'id': fields.String,
     'email': stringRestricted,
 
@@ -14,22 +15,25 @@ user_fields = {
     'thumb': fields.String,
 
     'roles': listRestricted(fields.String()),
-}
-
-users_render = {
-    'profiles': fields.List(fields.Nested(user_fields))
-}
-
-
-comment_fields_base = {
+})
+base_comment = render_api.model('Base Comment', {
     'id': fields.String,
-    'author': fields.Nested(user_fields),
+    'author': fields.Nested(base_user),
     'message': fields.String,
     'published_date': fields.String,
     'username': fields.String,
-}
-
-album_fields_base = {
+})
+base_log = render_api.model('Base Log fields', {
+    'id': fields.String,
+    'author': fields.Nested(base_user),
+    'message': fields.String,
+    'published': fields.Boolean,
+    'published_date': fields.String,
+    'recommended': fields.Boolean,
+    'comments': fields.List(fields.Nested(base_comment)),
+    'hits': fields.Integer,
+})
+base_album = render_api.model('Base Album', {
     'id': fields.String,
     'title': fields.String,
     'artist': fields.String,
@@ -39,41 +43,27 @@ album_fields_base = {
                                   if x and x.release_date else ''),
     'cover': fields.String,
     'thumb': fields.String,
-}
-
-log_fields_base = {
-    'id': fields.String,
-    'author': fields.Nested(user_fields),
-    'message': fields.String,
-    'published': fields.Boolean,
-    'published_date': fields.String,
-    'recommended': fields.Boolean,
-    'comments': fields.List(fields.Nested(comment_fields_base)),
-    'hits': fields.Integer,
-}
-
-
-album_fields = {
+})
+base_album_logs = render_api.inherit('Base Album with logs', base_album, {
     'mbrgid': fields.String,
     'mbaid': fields.String,
     'label': fields.String,
     'country': fields.String,
     'country_code': fields.String,
-    'logs': fields.List(fields.Nested(log_fields_base)),
-}
-album_fields.update(album_fields_base)
+    'logs': fields.List(fields.Nested(base_log))
+})
+base_log_album = render_api.inherit('Base Log Album fields', base_log, {
+    'album': fields.Nested(base_album)})
 
-album_render = {
-    'album': fields.Nested(album_fields)
-}
-albums_render = {
-    'albums': fields.List(fields.Nested(album_fields_base))
-}
-log_album_render = {
-    'album': fields.Nested(album_fields_base)
-}
-log_album_render.update(log_fields_base)
-
-logs_album_render = {
-    'logs': fields.List(fields.Nested(log_album_render))
-}
+user_render = render_api.model('User Resource', {
+    'profile': fields.Nested(base_user)})
+users_render = render_api.model('Users Resource', {
+    'profiles': fields.List(fields.Nested(base_user))})
+log_album_render = render_api.model('Log Resource', {
+    'log': fields.Nested(base_log_album)})
+logs_album_render = render_api.model('Logs Resource', {
+    'logs': fields.List(fields.Nested(base_log_album))})
+album_render = render_api.model('Album Resource', {
+    'album': fields.Nested(base_album_logs)})
+albums_render = render_api.model('Albums Resource', {
+    'albums': fields.List(fields.Nested(base_album))})

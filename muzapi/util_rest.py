@@ -19,10 +19,6 @@ class stringRestricted(fields.String):
             return fields.String.output(self, key, {}, **kwargs)
 
 
-def parse_request():
-    return None
-
-
 class RequestParser(reqparse.RequestParser):
 
     def __init__(self, argument_class=reqparse.Argument,

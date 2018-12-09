@@ -8,62 +8,35 @@ from datetime import datetime
 import re
 
 from muzapi.util_brainz import *
-from muzapi.util_rest import parse_request
+from muzapi.util_rest import RequestParser
 from muzapi.models import *
 from muzapi.render import *
 
 album_api = Namespace('Albums', path='/album',
                       description="Album resource")
 
-
-base_album = album_api.model('Base Album', {
-    'id': fields.String,
-    'title': fields.String,
-    'artist': fields.String,
-    'release_type': fields.String,
-    'release_date': fields.String,
-    'release_year': fields.String(attribute=lambda x: x.release_date.year
-                                  if x and x.release_date else ''),
-    'cover': fields.String,
-    'thumb': fields.String,
-})
+args = {
+    'title': {}, 'artist': {}, 'country': {}, 'country_code': {},
+    'release_type': {}, 'release_date': {}, 'label': {}, 'mbrgid': {}}
+request_parser = RequestParser(arguments=args)
 
 
-@album_api.route('/', '/<string:_id>')
-class Album_res(Resource):
+@album_api.route('/')
+class Albums_res(Resource):
 
+    @album_api.marshal_with(albums_render)
     def get(self, _id=None):
-        '''
-        Get Albums
-
-        :param_id: The _id of an Album object
-        '''
-        if (_id):
-            try:
-                album = Album.objects.get(id=_id)
-            except (DoesNotExist, ValidationError):
-                abort(404)
-            return marshal(album, album_fields, envelope='album')
-        else:
-            albums = Album.objects(deleted=False)
-            return marshal({'albums': albums}, albums_render)
+        '''Get Albums'''
+        return {'albums': Album.objects(deleted=False)}
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(album_fields, envelope="album")
+    @album_api.expect(request_parser)
+    @album_api.marshal_with(album_render)
     def post(self, _id=None):
-        '''
-        Create an Album
+        '''Create an Album'''
 
-        :param_id: (ignored)
-        '''
-
-        post_args = {
-            'title': {}, 'artist': {}, 'country': {}, 'country_code': {},
-            'release_type': {}, 'release_date': {}, 'label': {}, 'mbrgid': {}
-        }
-
-        content = parse_request(post_args)
+        content = request_parser.parse_args()
 
         if 'mbrgid' in content:
             album = album_from_mb_release_group(content['mbrgid'])
@@ -78,23 +51,31 @@ class Album_res(Resource):
         except ValidationError:
             abort(406)
 
-        return album
+        return {'album': album}
+
+
+@album_api.route('/<string:_id>')
+class Album_res(Resource):
+
+    @album_api.marshal_with(album_render)
+    def get(self, _id=None):
+        '''Get a specific Album'''
+        try:
+            return {'album': Album.objects.get(id=_id)}
+        except (DoesNotExist, ValidationError):
+            abort(404)
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(album_fields, envelope="album")
+    @album_api.expect(request_parser)
+    @album_api.marshal_with(album_render)
     def put(self, _id=None):
+        '''Update an Album'''
 
-        # Update an Album
-        put_args = {
-            'id': {'required': True, 'help': "Album id is required"},
-            'title': {}, 'artist': {}, 'country': {}, 'country_code': {},
-            'release_type': {}, 'release_date': {}, 'label': {}, 'mbrgid': {}
-        }
+        content = request_parser.parse_args()
 
-        content = parse_request(put_args)
         try:
-            album = Album.objects.get(id=content['id'])
+            album = Album.objects.get(id=_id)
         except (DoesNotExist, ValidationError):
             abort(404)
 
@@ -105,16 +86,13 @@ class Album_res(Resource):
         else:
             album.modify(**content)
 
-        return album
+        return {'album': album}
 
     @login_required
     @roles_accepted('admin', 'logger')
     def delete(self, _id=None):
-        '''
-        Delete an Album
+        '''Delete an Album'''
 
-        :param_id: The id of an Album object to delete
-        '''
         try:
             album = Album.objects.get(id=_id)
         except (DoesNotExist, ValidationError):
