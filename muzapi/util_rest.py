@@ -19,16 +19,22 @@ class stringRestricted(fields.String):
             return fields.String.output(self, key, {}, **kwargs)
 
 
-def parse_request(args):
-    data = request.get_json()
-    parser = reqparse.RequestParser()
-    for key, value in args.items():
-        if 'required' in value and value['required']:
-            parser.add_argument(key, **value)
-        elif 'init' in value and value['init']:
-            del value['init']
-            parser.add_argument(key, **value)
-        elif data and key in data:
-            parser.add_argument(key, **value)
+def parse_request():
+    return None
 
-    return parser.parse_args()
+
+class RequestParser(reqparse.RequestParser):
+
+    def __init__(self, argument_class=reqparse.Argument,
+                 result_class=reqparse.ParseResult, arguments={}):
+        super().__init__(argument_class=reqparse.Argument,
+                         result_class=reqparse.ParseResult)
+        self.add_arguments(arguments)
+        return
+
+    def add_argument(self, *args, **kwargs):
+        return super().add_argument(*args, store_missing=False, **kwargs)
+
+    def add_arguments(self, args):
+        for key, value in args.items():
+            self.add_argument(key, **value)

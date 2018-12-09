@@ -12,7 +12,8 @@ from muzapi.util_rest import parse_request
 from muzapi.models import *
 from muzapi.render import *
 
-album_api = Namespace('album', description="Album resource")
+album_api = Namespace('Albums', path='/album',
+                      description="Album resource")
 
 
 @album_api.route('/', '/<string:_id>')

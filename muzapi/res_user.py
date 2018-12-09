@@ -1,4 +1,4 @@
-from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
+from flask_restplus import Resource, fields, marshal_with, abort, Namespace, reqparse
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
@@ -6,54 +6,83 @@ from mongoengine.errors import ValidationError
 from datetime import datetime
 
 
-from muzapi.util_rest import parse_request
-from muzapi.models import *
-from muzapi.render import *
-
-user_api = Namespace('profile', description="User resource")
+from muzapi.util_rest import RequestParser
+from muzapi.models import User, Role
+from muzapi.util_rest import *
 
 
-@user_api.route('/', '/<string:_id>')
-class User_res(Resource):
+user_api = Namespace('Profiles', path='/profile',
+                     description="User resource")
 
-    def get(self, _id=None):
-        '''
-        Get Users
 
-        :param_id: The _id of an User object
-        '''
-        if _id == 'me':
-            return marshal(current_user, user_fields, envelope='profile')
-        elif _id:
-            try:
-                user = User.objects.get(id=_id)
-            except (DoesNotExist, ValidationError):
-                abort(404)
-            return marshal(user, user_fields, envelope='profile')
-        elif current_user.has_role('admin'):
+user_fields = user_api.model('User fields', {
+    'id': fields.String,
+    'email': stringRestricted,
+
+    'bio': fields.String,
+    'username': fields.String,
+    'color': fields.String,
+
+    'avatar': fields.String,
+    'thumb': fields.String,
+
+    'roles': listRestricted(fields.String()),
+})
+users_render = user_api.model('Users Resource', {
+    'profiles': fields.List(fields.Nested(user_fields))
+})
+user_render = user_api.model('User Resource', {
+    'profile': fields.Nested(user_fields)
+})
+
+parser_args = {'bio': {}, 'color': {}, 'username': {}}
+parser = RequestParser(arguments=parser_args)
+
+
+@user_api.route('/')
+class Users_res(Resource):
+
+    @user_api.marshal_with(users_render)
+    def get(self):
+        '''Get a list of Users'''
+        if current_user.has_role('admin'):
             users = User.objects()
         else:
             log_role = Role.objects.get(name="logger")
             users = User.objects.filter(roles__contains=log_role)
 
-        return marshal({'profiles': users}, users_render)
+        return {'profiles': users}
+
+
+@user_api.route('/<string:_id>')
+class User_res(Resource):
+
+    @user_api.marshal_with(user_render)
+    def get(self, _id=None):
+        '''Get a specific User'''
+        if _id == 'me':
+            user = current_user
+        else:
+            try:
+                user = User.objects.get(id=_id)
+            except (DoesNotExist, ValidationError):
+                abort(404)
+
+        return {'profile': user}
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(user_fields, envelope='profile')
+    @user_api.expect(parser)
+    @user_api.marshal_with(user_render)
     def put(self, _id=None):
+        '''Update specific User'''
+        content = parser.parse_args()
 
-        # Update User
-
-        args = {'id': {'required': True, 'help': 'User id is required'},
-                'bio': {}, 'color': {}, 'username': {}}
-        content = parse_request(args)
-
-        if content['id'] == str(current_user.id):
+        if _id == str(current_user.id):
             user = current_user
         elif current_user.has_role('admin'):
             try:
-                user = User.objects.get(id=content['id'])
+                user = User.objects.get(id=_id)
             except (DoesNotExist, ValidationError):
                 abort(404)
         else:
@@ -63,4 +92,4 @@ class User_res(Resource):
         except ValidationError:
             abort(406)
 
-        return user
+        return {'profile': user}

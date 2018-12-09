@@ -9,7 +9,7 @@ from muzapi.res_album import album_api
 muzlog_api = Blueprint('muzlog_api', __name__)
 
 api = Api(muzlog_api,
-          title="muzlog api",
+          title="Muzlog API",
           version='1.0',
           description='The muzlog.com api',
           prefix='/api',

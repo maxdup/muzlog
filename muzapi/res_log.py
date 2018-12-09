@@ -10,7 +10,8 @@ from muzapi.util_rest import parse_request
 from muzapi.models import *
 from muzapi.render import *
 
-log_api = Namespace('log', description="Log resource")
+log_api = Namespace('Logs', path='/log',
+                    description="Log resource")
 
 
 @log_api.route('/', '/<string:_id>')

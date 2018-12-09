@@ -2,33 +2,35 @@ from flask_restplus import Resource, fields, marshal, marshal_with, abort, Names
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
-from muzapi.util_rest import parse_request
+from muzapi.util_rest import RequestParser
 from muzapi.models import User, Role
-from muzapi.render import user_fields
+from muzapi.res_user import user_fields, user_render
 
-role_api = Namespace('role', description="Role resource")
+role_api = Namespace('Roles', path='/role',
+                     description="Role resource")
+
+parser_args = {'id': {'required': True, 'help': "User id is required"},
+               'role': {'required': True, 'help': "Role name is required"}}
+parser = RequestParser(arguments=parser_args)
 
 
 @role_api.route('/')
 class Role_res(Resource):
 
-    args = {'id': {'required': True, 'help': "user id is required"},
-            'role': {'required': True, 'help': "role is required"}}
-
     @login_required
     @roles_accepted('admin')
-    @marshal_with(user_fields, skip_none=True)
+    @role_api.marshal_with(user_fields, skip_none=True)
     def get(self):
-        # Get All Roles
+        '''Get All Roles'''
         return {'roles': Role.objects()}
 
     @login_required
     @roles_accepted('admin')
-    @marshal_with(user_fields, envelope="profile")
+    @role_api.expect(parser)
+    @role_api.marshal_with(user_render)
     def post(self):
-
-        # Add a role
-        content = parse_request(self.args)
+        '''Grant a role to a User'''
+        content = parser.parse_args()
 
         try:
             user = User.objects.get(id=content['id'])
@@ -40,16 +42,15 @@ class Role_res(Resource):
             user.roles.append(role)
             user.save()
 
-        return user
+        return {'profile': user}
 
     @login_required
     @roles_accepted('admin')
-    @marshal_with(user_fields, envelope="profile")
+    @role_api.expect(parser)
+    @role_api.marshal_with(user_render)
     def put(self):
-
-        # Revoke a role
-
-        content = parse_request(self.args)
+        '''Revoke a role from a User'''
+        content = parser.parse_args()
 
         try:
             user = User.objects.get(id=content['id'])
@@ -64,7 +65,7 @@ class Role_res(Resource):
             user.roles = [x for x in user.roles if x.id != role.id]
             user.save()
 
-        return user
+        return {'profile': user}
 
 
 def ensure_roles():

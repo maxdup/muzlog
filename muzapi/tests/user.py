@@ -89,8 +89,7 @@ class UsersTestCase(unittest.TestCase):
             sess['_fresh'] = True
         r = self.client.put('api/profile/' + str(self.u_1.id),
                             content_type='application/json',
-                            data=json.dumps({'id': str(self.u_1.id),
-                                             'bio': 'im me',
+                            data=json.dumps({'bio': 'im me',
                                              'color': '#333',
                                              'username': 'me'}))
         self.assertEqual(r.status_code, 302)
@@ -99,7 +98,7 @@ class UsersTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger1.id)
             sess['_fresh'] = True
-        r = self.client.put('api/profile',
+        r = self.client.put('api/profile/' + str(self.u_logger1.id),
                             content_type='application/json',
                             data=json.dumps({'id': str(self.u_logger1.id),
                                              'bio': 'im me',
@@ -113,30 +112,27 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(data['profile']['username'], 'me')
 
         # test color regex
-        r = self.client.put('api/profile',
+        r = self.client.put('api/profile/' + str(self.u_logger1.id),
                             content_type='application/json',
-                            data=json.dumps({'id': str(self.u_logger1.id),
-                                             'color': '#3333'}))
+                            data=json.dumps({'color': '#55555'}))
         self.assertEqual(r.status_code, 406)
 
         # test logger role fail on others
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger1.id)
             sess['_fresh'] = True
-        r = self.client.put('api/profile',
+        r = self.client.put('api/profile/' + str(self.u_1.id),
                             content_type='application/json',
-                            data=json.dumps({'id': str(self.u_1.id),
-                                             'bio': 'im me'}))
+                            data=json.dumps({'bio': 'im me'}))
         self.assertEqual(r.status_code, 403)
 
         # test admin role works on others
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_admin.id)
             sess['_fresh'] = True
-        r = self.client.put('api/profile',
+        r = self.client.put('api/profile/' + str(self.u_1.id),
                             content_type='application/json',
-                            data=json.dumps({'id': str(self.u_1.id),
-                                             'bio': 'im not you',
+                            data=json.dumps({'bio': 'im not you',
                                              'color': '#555555'}))
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())
@@ -150,7 +146,6 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(user.color, '#555555')
 
         # test by bad id
-        r = self.client.put('api/profile',
-                            content_type='application/json',
-                            data=json.dumps({'id': '000000000000000000000000'}))
-        self.assertEqual(r.status_code, 404)
+        r = self.client.put('api/profile/000000000000000000000000',
+                            content_type='application/json')
+        self.assertEqual(r.status_code, 400)
