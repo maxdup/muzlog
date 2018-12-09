@@ -6,54 +6,70 @@ from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util_rest import parse_request
+from muzapi.util_rest import RequestParser
 from muzapi.models import *
-from muzapi.render import *
+from muzapi.res_album import base_album
+from muzapi.res_user import base_user
 
 log_api = Namespace('Logs', path='/log',
                     description="Log resource")
 
+base_comment = log_api.model('Base Comment', {
+    'id': fields.String,
+    'author': fields.Nested(base_user),
+    'message': fields.String,
+    'published_date': fields.String,
+    'username': fields.String,
+})
+base_log = log_api.model('Base Log fields', {
+    'id': fields.String,
+    'author': fields.Nested(base_user),
+    'message': fields.String,
+    'published': fields.Boolean,
+    'published_date': fields.String,
+    'recommended': fields.Boolean,
+    'comments': fields.List(fields.Nested(base_comment)),
+    'hits': fields.Integer,
+})
+base_log_album = log_api.inherit('Base Log Album fields', base_log, {
+    'album': fields.Nested(base_album)})
 
-@log_api.route('/', '/<string:_id>')
-class Log_res(Resource):
+log_album_render = log_api.model('Log Resource', {
+    'log': fields.Nested(base_log_album)})
 
+logs_album_render = log_api.model('Logs Resource', {
+    'logs': fields.List(fields.Nested(base_log_album))})
+
+post_args = {
+    'album': {'required': True, 'help': "album is required"},
+    'message': {'required': True, 'help': "message is required"},
+    'published': {'type': bool}, 'recommended': {'type': bool},
+    'published_date': {}
+}
+post_parser = RequestParser(arguments=post_args)
+
+put_args = {
+    'published': {'type': bool}, 'published_date': {},
+    'recommended': {'type': bool}, 'message': {}}
+put_parser = RequestParser(arguments=put_args)
+
+
+@log_api.route('/')
+class Logs_res(Resource):
+
+    @log_api.marshal_with(logs_album_render)
     def get(self, _id=None):
-        '''
-        Get a specific log
-
-        :param_id: The _id of a Log object to get
-        '''
-        if _id == 'me':
-            if not current_user.has_role('logger') and \
-               not current_user.has_role('admin'):
-                abort(403)
-            logs = Log.objects(author=current_user.id).order_by(
-                'published', '-published_date')
-            return marshal({'logs': logs}, logs_album_render)
-        elif _id:
-            try:
-                log = Log.objects.get(id=_id)
-                return marshal(log, log_album_render, envelope="log")
-            except (DoesNotExist, ValidationError):
-                abort(404)
-        else:
-            logs = Log.objects(published=True).order_by('-published_date')
-            return marshal({'logs': logs}, logs_album_render)
+        '''Get available logs'''
+        return {'logs': Log.objects(published=True).order_by('-published_date')}
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(log_album_render, envelope="log")
+    @log_api.expect(post_parser)
+    @log_api.marshal_with(log_album_render)
     def post(self, id=None):
+        '''Create an album log'''
 
-        # Create an album log
-
-        post_args = {
-            'album': {'required': True, 'help': "album is required"},
-            'message': {'required': True, 'help': "message is required"},
-            'published': {'type': bool, 'init': True}, 'published_date': {},
-            'recommended': {'type': bool, 'init': True}}
-
-        content = parse_request(post_args)
+        content = post_parser.parse_args()
 
         try:
             content['album'] = Album.objects.get(id=content['album'])
@@ -67,27 +83,42 @@ class Log_res(Resource):
         log.album.logs.append(log)
         log.album.save()
 
-        return log
+        return {'log': log}
+
+
+@log_api.route('/me')
+class myLogs_res(Resource):
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @marshal_with(log_album_render, envelope="log")
+    @log_api.marshal_with(logs_album_render)
+    def get(self, _id=None):
+        '''Get authenticated user's logs'''
+        return {'logs': Log.objects(author=current_user.id).order_by(
+            'published', '-published_date')}
+
+
+@log_api.route('/<string:_id>')
+class Log_res(Resource):
+
+    @log_api.marshal_with(log_album_render)
+    def get(self, _id=None):
+        '''Get a specific log'''
+        try:
+            return {'log': Log.objects.get(id=_id)}
+        except (DoesNotExist, ValidationError):
+            abort(404)
+
+    @login_required
+    @roles_accepted('admin', 'logger')
+    @log_api.expect(post_parser)
+    @log_api.marshal_with(log_album_render)
     def put(self, _id=None):
-        '''
-        Update an album log
-
-        :param_id: The _id of a Log object to update
-        '''
-
-        put_args = {
-            'id': {'required': True, 'help': 'album is is require'},
-            'published': {'type': bool}, 'published_date': {},
-            'recommended': {'type': bool}, 'message': {}}
-
-        content = parse_request(put_args)
+        '''Update an album log'''
+        content = put_parser.parse_args()
 
         try:
-            log = Log.objects.get(id=content['id'])
+            log = Log.objects.get(id=_id)
         except (DoesNotExist, ValidationError):
             abort(404)
 
@@ -99,16 +130,12 @@ class Log_res(Resource):
         log.save()
         log.reload()
 
-        return log
+        return {'log': log}
 
     @login_required
     @roles_accepted('admin', 'logger')
     def delete(self, _id=None):  # delete room
-        '''
-        Delete an ablum log
-
-        :param_id: The _id of a Log object to delete
-        '''
+        '''Delete an ablum log'''
         try:
             log = Log.objects.get(id=_id)
         except (DoesNotExist, ValidationError):

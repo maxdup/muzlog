@@ -86,10 +86,10 @@ class LogsTestCase(unittest.TestCase):
         data = json.loads(r.data.decode())
         self.assertEqual(len(data['logs']), 2)
 
-        # test /log/me 403
+        # test /log/me 302
         r = self.client.get('api/log/me',
                             headers={'content-type': 'application/json'})
-        self.assertEqual(r.status_code, 403)
+        self.assertEqual(r.status_code, 302)
 
         # test /log/me
         with self.client.session_transaction() as sess:
@@ -204,7 +204,7 @@ class LogsTestCase(unittest.TestCase):
                             data=json.dumps({'id': str(self.log_1.id),
                                              'message': 'a message',
                                              'album': str(self.album_1.id)}))
-        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.status_code, 405)
 
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger_1.id)
@@ -213,15 +213,15 @@ class LogsTestCase(unittest.TestCase):
         # test incomplete /log/
         r = self.client.put('api/log', content_type='application/json',
                             data=json.dumps({'message': 'a message'}))
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, 405)
         r = self.client.put('api/log', content_type='application/json',
                             data=json.dumps({'album': str(self.album_1.id)}))
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, 405)
 
         # test wrong album id /log/
-        r = self.client.put('api/log', content_type='application/json',
-                            data=json.dumps({'id': '000000000000000000000000',
-                                             'message': 'a message'}))
+        r = self.client.put('api/log/000000000000000000000000',
+                            content_type='application/json',
+                            data=json.dumps({'message': 'a message'}))
         self.assertEqual(r.status_code, 404)
 
         # test block when not author
@@ -229,18 +229,18 @@ class LogsTestCase(unittest.TestCase):
             sess['user_id'] = str(self.u_logger_2.id)
             sess['_fresh'] = True
 
-        r = self.client.put('api/log', content_type='application/json',
-                            data=json.dumps({'id': str(self.log_1.id),
-                                             'message': 'a message'}))
+        r = self.client.put('api/log/' + str(self.log_1.id),
+                            content_type='application/json',
+                            data=json.dumps({'message': 'a message'}))
         self.assertEqual(r.status_code, 403)
 
         # test partial /log/
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger_1.id)
             sess['_fresh'] = True
-        r = self.client.put('api/log', content_type='application/json',
-                            data=json.dumps({'id': str(self.log_2.id),
-                                             'message': 'an edited message'}))
+        r = self.client.put('api/log/' + str(self.log_2.id),
+                            content_type='application/json',
+                            data=json.dumps({'message': 'an edited message'}))
         self.assertEqual(r.status_code, 200)
         data = json.loads(r.data.decode())['log']
         self.assertEqual(data['message'], 'an edited message')
@@ -252,9 +252,9 @@ class LogsTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger_1.id)
             sess['_fresh'] = True
-        r = self.client.put('api/log', content_type='application/json',
-                            data=json.dumps({'id': str(self.log_2.id),
-                                             'published': True,
+        r = self.client.put('api/log/' + str(self.log_2.id),
+                            content_type='application/json',
+                            data=json.dumps({'published': True,
                                              'recommended': True,
                                              'message': 'an edited log'}))
         # assert response
@@ -276,9 +276,9 @@ class LogsTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger_1.id)
             sess['_fresh'] = True
-        r = self.client.put('api/log', content_type='application/json',
-                            data=json.dumps({'id': str(self.log_2.id),
-                                             'published': False,
+        r = self.client.put('api/log/' + str(self.log_2.id),
+                            content_type='application/json',
+                            data=json.dumps({'published': False,
                                              'recommended': False,
                                              'message': 'an unpublished log'}))
         self.assertEqual(r.status_code, 200)
@@ -287,9 +287,9 @@ class LogsTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = str(self.u_logger_1.id)
             sess['_fresh'] = True
-        r = self.client.put('api/log', content_type='application/json',
-                            data=json.dumps({'id': str(self.log_1.id),
-                                             'published': False,
+        r = self.client.put('api/log/' + str(self.log_1.id),
+                            content_type='application/json',
+                            data=json.dumps({'published': False,
                                              'recommended': False,
                                              'message': 'an unpublished log'}))
         self.assertEqual(r.status_code, 200)
@@ -305,9 +305,9 @@ class LogsTestCase(unittest.TestCase):
             sess['user_id'] = str(self.u_logger_1.id)
             sess['_fresh'] = True
         r = self.client.delete('api/log')
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, 405)
         r = self.client.delete('api/log/')
-        self.assertEqual(r.status_code, 404)
+        self.assertEqual(r.status_code, 405)
 
         # test invalid id
         with self.client.session_transaction() as sess:

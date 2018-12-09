@@ -4,7 +4,7 @@ from mongoengine.queryset import DoesNotExist
 
 from muzapi.util_rest import RequestParser
 from muzapi.models import User, Role
-from muzapi.res_user import user_fields, user_render
+from muzapi.res_user import base_user, user_render
 
 role_api = Namespace('Roles', path='/role',
                      description="Role resource")
@@ -19,7 +19,7 @@ class Role_res(Resource):
 
     @login_required
     @roles_accepted('admin')
-    @role_api.marshal_with(user_fields, skip_none=True)
+    @role_api.marshal_with(base_user, skip_none=True)
     def get(self):
         '''Get All Roles'''
         return {'roles': Role.objects()}

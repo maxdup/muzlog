@@ -15,7 +15,7 @@ user_api = Namespace('Profiles', path='/profile',
                      description="User resource")
 
 
-user_fields = user_api.model('User fields', {
+base_user = user_api.model('Base User fields', {
     'id': fields.String,
     'email': stringRestricted,
 
@@ -28,11 +28,11 @@ user_fields = user_api.model('User fields', {
 
     'roles': listRestricted(fields.String()),
 })
-users_render = user_api.model('Users Resource', {
-    'profiles': fields.List(fields.Nested(user_fields))
-})
 user_render = user_api.model('User Resource', {
-    'profile': fields.Nested(user_fields)
+    'profile': fields.Nested(base_user)
+})
+users_render = user_api.model('Users Resource', {
+    'profiles': fields.List(fields.Nested(base_user))
 })
 
 parser_args = {'bio': {}, 'color': {}, 'username': {}}

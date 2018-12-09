@@ -16,6 +16,19 @@ album_api = Namespace('Albums', path='/album',
                       description="Album resource")
 
 
+base_album = album_api.model('Base Album', {
+    'id': fields.String,
+    'title': fields.String,
+    'artist': fields.String,
+    'release_type': fields.String,
+    'release_date': fields.String,
+    'release_year': fields.String(attribute=lambda x: x.release_date.year
+                                  if x and x.release_date else ''),
+    'cover': fields.String,
+    'thumb': fields.String,
+})
+
+
 @album_api.route('/', '/<string:_id>')
 class Album_res(Resource):
 
