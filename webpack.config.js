@@ -13,6 +13,7 @@ module.exports = {
       "./node_modules/jquery/dist/jquery.min.js",
     ],
     site: [
+      "./node_modules/materialize-css/sass/materialize.scss",
       rootAssetPath + "/scss/security.scss",
       rootAssetPath + "/scss/site.scss"
     ],
