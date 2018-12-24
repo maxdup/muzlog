@@ -45,8 +45,8 @@ base_album = render_api.model('Base Album', {
     'thumb': fields.String,
 })
 base_album_logs = render_api.inherit('Base Album with logs', base_album, {
-    'mbrgid': fields.String,
-    'mbaid': fields.String,
+    # 'mbrgid': fields.String,
+    # 'mbaid': fields.String,
     'label': fields.String,
     'country': fields.String,
     'country_code': fields.String,
