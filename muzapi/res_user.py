@@ -1,4 +1,4 @@
-from flask_restplus import Resource, fields, marshal_with, abort, Namespace, reqparse
+from flask_restx import Resource, fields, marshal_with, abort, Namespace, reqparse
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
@@ -6,9 +6,9 @@ from mongoengine.errors import ValidationError
 from datetime import datetime
 
 
-from muzapi.util_rest import RequestParser
+from muzapi.utils_rest import RequestParser
 from muzapi.models import User, Role
-from muzapi.util_rest import *
+from muzapi.utils_rest import *
 from muzapi.render import user_render, users_render
 
 

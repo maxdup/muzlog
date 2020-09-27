@@ -1,5 +1,5 @@
 from flask import current_app as app
-from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
+from flask_restx import Resource, fields, marshal, marshal_with, abort, Namespace
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
@@ -7,8 +7,8 @@ from mongoengine.errors import ValidationError
 from datetime import datetime
 import re
 
-from muzapi.util_brainz import *
-from muzapi.util_rest import RequestParser
+from muzapi.utils_brainz import *
+from muzapi.utils_rest import RequestParser
 from muzapi.models import *
 from muzapi.render import *
 
@@ -38,8 +38,9 @@ class Albums_res(Resource):
 
         content = request_parser.parse_args()
 
-        if 'mbrgid' in content:
-            album = album_from_mb_release_group(content['mbrgid'])
+        mbrgid = content.pop('mbrgid', None)
+        if mbrgid:
+            album = album_from_mb_release_group(mbrgid)
             if album.deleted:
                 album.deleted = False
         else:
@@ -79,12 +80,16 @@ class Album_res(Resource):
         except (DoesNotExist, ValidationError):
             abort(404)
 
-        if 'mbrgid' in content and content['mbrgid'] and content['mbrgid'] != album.mbrgid:
-            album = album_from_mb_release_group(content['mbrgid'], album)
+        mbrgid = content.pop('mbrgid', None)
+        if mbrgid and mbrgid != album.mbrgid:
+            album = album_from_mb_release_group(mbrgid, album)
             album.save()
             album.reload()
-        else:
-            album.modify(**content)
+        elif content:
+            try:
+                album.modify(**content)
+            except ValidationError:
+                abort(406)
 
         return {'album': album}
 

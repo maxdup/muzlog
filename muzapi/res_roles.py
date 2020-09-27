@@ -1,8 +1,8 @@
-from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
+from flask_restx import Resource, fields, marshal, marshal_with, abort, Namespace
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 
-from muzapi.util_rest import RequestParser
+from muzapi.utils_rest import RequestParser
 from muzapi.models import User, Role
 from muzapi.render import base_user, user_render
 
@@ -66,15 +66,3 @@ class Role_res(Resource):
             user.save()
 
         return {'profile': user}
-
-
-def ensure_roles():
-    if not Role.objects(name="admin"):
-        role_admin = Role(name="admin",
-                          description="includes all permissions")
-        role_admin.save()
-
-    if not Role.objects(name="logger"):
-        role_logger = Role(name="logger",
-                           description="common poster")
-        role_logger.save()

@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask_restplus import Api
+from flask_restx import Api
 
 from muzapi.res_roles import role_api
 from muzapi.res_log import log_api

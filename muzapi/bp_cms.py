@@ -1,6 +1,6 @@
 from flask import current_app as app, Blueprint, request, render_template, session
 from flask_security import current_user, roles_accepted, login_required
-from flask_restful import abort, reqparse
+from flask_restx import abort, reqparse
 
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError

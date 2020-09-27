@@ -1,6 +1,6 @@
 from flask import current_app as app
 from flask_security import current_user
-from flask_restplus import abort
+from flask_restx import abort
 from muzapi import Role
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError

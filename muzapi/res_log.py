@@ -1,12 +1,12 @@
 from flask import request, jsonify
-from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
+from flask_restx import Resource, fields, marshal, marshal_with, abort, Namespace
 from flask_security import current_user, roles_accepted, login_required
 from mongoengine.queryset import DoesNotExist
 from mongoengine.errors import ValidationError
 
 from datetime import datetime
 
-from muzapi.util_rest import RequestParser
+from muzapi.utils_rest import RequestParser
 from muzapi.models import *
 from muzapi.render import logs_album_render, log_album_render
 
@@ -47,14 +47,18 @@ class Logs_res(Resource):
         try:
             content['album'] = Album.objects.get(id=content['album'])
             content['author'] = current_user.id
-        except (DoesNotExist, ValidationError):
+        except DoesNotExist:
             abort(404)
 
         log = Log(**content)
-        log.save()
-        log.reload()
-        log.album.logs.append(log)
-        log.album.save()
+
+        try:
+            log.save()
+            log.reload()
+            log.album.logs.append(log)
+            log.album.save()
+        except ValidationError:
+            abort(406)
 
         return {'log': log}
 
@@ -84,7 +88,7 @@ class Log_res(Resource):
 
     @login_required
     @roles_accepted('admin', 'logger')
-    @log_api.expect(post_parser)
+    @log_api.expect(put_parser)
     @log_api.marshal_with(log_album_render)
     def put(self, _id=None):
         '''Update an album log'''
@@ -99,9 +103,13 @@ class Log_res(Resource):
             if log.author.id != current_user.id:
                 abort(403)
 
-        log.modify(**content)
-        log.save()
-        log.reload()
+        if content:
+            try:
+                log.update(**content)
+                log.save()
+                log.reload()
+            except ValidationError:
+                abort(406)
 
         return {'log': log}
 

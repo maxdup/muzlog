@@ -1,5 +1,5 @@
-from flask_restplus import Resource, fields, marshal, marshal_with, abort, Namespace
-from muzapi.util_rest import *
+from flask_restx import Resource, fields, marshal, marshal_with, abort, Namespace
+from muzapi.utils_rest import *
 
 render_api = Namespace('Models', description="resoruce renders")
 
@@ -45,7 +45,7 @@ base_album = render_api.model('Base Album', {
     'thumb': fields.String,
 })
 base_album_logs = render_api.inherit('Base Album with logs', base_album, {
-    # 'mbrgid': fields.String,
+    'mbrgid': fields.String,
     # 'mbaid': fields.String,
     'label': fields.String,
     'country': fields.String,

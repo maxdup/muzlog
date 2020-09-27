@@ -1,5 +1,5 @@
 from flask import request
-from flask_restplus import fields, reqparse
+from flask_restx import fields, reqparse
 from flask_security import current_user
 
 
@@ -19,18 +19,20 @@ class stringRestricted(fields.String):
             return fields.String.output(self, key, {}, **kwargs)
 
 
-class RequestParser(reqparse.RequestParser):
-
-    def __init__(self, argument_class=reqparse.Argument,
-                 result_class=reqparse.ParseResult, arguments={}):
-        super().__init__(argument_class=reqparse.Argument,
-                         result_class=reqparse.ParseResult)
-        self.add_arguments(arguments)
+class MuzArgument(reqparse.Argument):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.store_missing = False
+        self.nullable = False
         return
 
-    def add_argument(self, *args, **kwargs):
-        return super().add_argument(*args, store_missing=False, **kwargs)
 
-    def add_arguments(self, args):
-        for key, value in args.items():
+class RequestParser(reqparse.RequestParser):
+
+    def __init__(self, argument_class=MuzArgument,
+                 result_class=reqparse.ParseResult, arguments={}):
+        super().__init__(argument_class=MuzArgument,
+                         result_class=reqparse.ParseResult)
+        for key, value in arguments.items():
             self.add_argument(key, **value)
+        return
