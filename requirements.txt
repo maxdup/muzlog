@@ -3,6 +3,8 @@ flask-cors
 flask_restx
 flask-security-too
 flask-mongoengine
+pytest-flask
+pytest-cov
 bcrypt
 musicbrainzngs
 faker
